@@ -10,13 +10,13 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════════
      AUTH SCREEN
-═══════════════════════════════════════════════ -->
+     ═══════════════════════════════════════════════════════════ -->
 <div id="authScreen">
   <div class="auth-box">
     <div class="auth-logo">Sinergie <em>·</em></div>
-    <div class="auth-subtitle">Pannello admin — Estetica Sinergie</div>
+    <div class="auth-subtitle">Pannello amministrativo · Estetica Sinergie</div>
 
     <!-- Step 1: email + password -->
     <div id="loginStep">
@@ -32,9 +32,14 @@
       <button class="auth-btn" id="authLoginBtn">Accedi</button>
     </div>
 
-    <!-- Step 2: OTP (se MFA abilitato su Supabase) -->
+    <!-- Step 2: OTP (se MFA abilitato)
+         PER ABILITARE OTP EMAIL IN SUPABASE:
+         1. Vai su Authentication → Sign In Methods → Enable Email OTP
+         2. Oppure usa Authentication → MFA → enable TOTP/OTP
+         3. Supabase restituirà un errore con factor_id se MFA è richiesto;
+            gestisci con supabase.auth.mfa.challenge() + verify() come sotto. -->
     <div id="otpStep" class="auth-field">
-      <p class="auth-info">Controlla la tua email — ti abbiamo inviato un codice a 6 cifre.</p>
+      <p class="auth-info">Controlla la tua email — ti abbiamo inviato un codice OTP a 6 cifre.</p>
       <div class="auth-field">
         <label for="authOtp">Codice OTP</label>
         <input type="text" id="authOtp" placeholder="123456" maxlength="6" inputmode="numeric">
@@ -45,10 +50,9 @@
   </div>
 </div>
 
-
-<!-- ═══════════════════════════════════════════════
+<!-- ═══════════════════════════════════════════════════════════
      APP SCREEN
-═══════════════════════════════════════════════ -->
+     ═══════════════════════════════════════════════════════════ -->
 <div id="appScreen">
 
   <!-- TOP BAR -->
@@ -57,7 +61,7 @@
     <span class="topbar-badge">Admin</span>
     <div class="topbar-spacer"></div>
     <div class="topbar-search">
-      <input type="search" id="searchInput" placeholder="Cerca nome…" autocomplete="off">
+      <input type="search" id="searchInput" placeholder="Cerca nome o telefono…" autocomplete="off">
       <span class="s-icon">⌕</span>
     </div>
     <button class="btn-logout" id="btnLogout">Esci</button>
@@ -94,18 +98,18 @@
     </div>
   </div>
 
-  <!-- SETUP SQL — istruzioni per lo sviluppatore -->
+  <!-- SQL SETUP — istruzioni per lo sviluppatore -->
   <details class="sql-block">
-    <summary>Setup Supabase — SQL e istruzioni (solo sviluppatore)</summary>
+    <summary>Setup Supabase — istruzioni SQL (solo sviluppatore)</summary>
     <div class="sql-content">
       <p class="note">
         Esegui questo SQL nel pannello Supabase → SQL Editor per creare la tabella e
-        configurare Row Level Security. Poi inserisci le tue credenziali nelle costanti
-        in cima allo script di questa pagina e in <code>sinergie-dove-siamo.html</code>.
+        configurare Row Level Security. Poi inserisci le tue credenziali nelle 4 costanti
+        in cima allo script di questa pagina.
       </p>
-      <pre>-- ══════════════════════════════════════════
--- Tabella domande (richieste clienti)
--- ══════════════════════════════════════════
+      <pre>-- ═══════════════════════════════════════════════════════
+-- Tabella domande — richieste delle clienti dal sito
+-- ═══════════════════════════════════════════════════════
 create table domande (
   id          uuid default gen_random_uuid() primary key,
   created_at  timestamptz default now(),
@@ -120,42 +124,34 @@ create table domande (
   risposta_at timestamptz
 );
 
--- Abilita RLS
+-- Abilita Row Level Security
 alter table domande enable row level security;
 
--- Il form pubblico può solo inserire (anon key)
+-- Chiunque può inserire dal form pubblico (usa anon key nel form)
 create policy "insert_public" on domande
   for insert to anon with check (true);
 
--- Solo utenti autenticati possono leggere e modificare
+-- Solo utenti autenticati (Barbara) possono leggere e modificare
 create policy "all_authenticated" on domande
   for all to authenticated using (true);
 
--- Indice per data (ordinamento)
+-- Indice per ordinamento per data
 create index idx_domande_created on domande(created_at desc);
 
--- ══════════════════════════════════════════
--- Abilita Realtime (per notifiche live in admin)
--- ══════════════════════════════════════════
--- In Supabase → Database → Replication:
--- abilita la tabella "domande" per realtime.
--- ══════════════════════════════════════════
+-- ═══════════════════════════════════════════════════════
+-- Abilita Realtime (notifiche nuove domande senza refresh)
+-- ═══════════════════════════════════════════════════════
+-- Supabase → Database → Replication → abilita "domande"
 
--- CREDENZIALI DA INSERIRE:
--- 1. In questa pagina (admin): SUPABASE_URL e SUPABASE_SERVICE_KEY
---    La service_role key si trova in:
---    Supabase → Project Settings → API → service_role (secret)
---
--- 2. In sinergie-dove-siamo.html (form pubblico): SUPABASE_URL e SUPABASE_ANON_KEY
---    La anon key si trova in:
---    Supabase → Project Settings → API → anon (public)
---
--- 3. Per i Twilio SMS (risposte): TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM
---    Crea un account su twilio.com, acquista un numero italiano
---    e inserisci qui le credenziali.
---    NOTA: le credenziali Twilio sono visibili nel sorgente JS.
---    Per un uso professionale considera una Supabase Edge Function.
+-- ═══════════════════════════════════════════════════════
+-- Utente admin: Supabase → Authentication → Users → Add User
+-- Inserisci email e password con cui Barbara accederà a questa pagina.
+-- ═══════════════════════════════════════════════════════
 </pre>
+      <p class="note" style="margin-top:1rem;">
+        Per la pagina admin usa la <strong>service_role key</strong> (non anon key) —
+        può bypassare RLS. Trovala in Supabase → Project Settings → API → service_role.
+      </p>
     </div>
   </details>
 
@@ -166,41 +162,64 @@ create index idx_domande_created on domande(created_at desc);
 
 
 <script type="module">
-// ════════════════════════════════════════════════════════════════
-//  CONFIGURAZIONE ← inserisci qui i tuoi dati reali
-// ════════════════════════════════════════════════════════════════
+// ╔═══════════════════════════════════════════════════════════════════╗
+// ║                                                                   ║
+// ║   CONFIGURAZIONE — INSERISCI QUI LE TUE CREDENZIALI              ║
+// ║   Devi compilare i 4 blocchi qui sotto prima di usare l'admin.   ║
+// ║                                                                   ║
+// ╚═══════════════════════════════════════════════════════════════════╝
 
-// Supabase — usa la service_role key (non la anon key) nell'admin
-// la trovi in: Supabase → Project Settings → API → service_role
-const SUPABASE_URL         = 'https://YOUR_PROJECT.supabase.co';      // ← sostituisci
-const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.YOUR_SERVICE_KEY'; // ← sostituisci
 
-// Twilio — per l'invio SMS alle clienti
-// Crea un account su twilio.com/try-twilio, acquista un numero e incolla qui.
-// NOTA: in un'app di produzione seria queste credenziali andrebbero in una
-// Supabase Edge Function per non esporle nel sorgente del browser.
-const TWILIO_SID   = 'YOUR_TWILIO_ACCOUNT_SID';   // ← Account SID da twilio.com/console
-const TWILIO_TOKEN = 'YOUR_TWILIO_AUTH_TOKEN';     // ← Auth Token da twilio.com/console
-const TWILIO_FROM  = '+39000000000';               // ← Numero Twilio acquistato (+39...)
+// ┌───────────────────────────────────────────────────────────────────┐
+// │  BLOCCO 1 — SUPABASE PROJECT URL                                  │
+// │  Dove trovarlo: Supabase → Project Settings → API → Project URL   │
+// │  Esempio:  https://abcdefghijklm.supabase.co                      │
+// └───────────────────────────────────────────────────────────────────┘
+const SUPABASE_URL = 'https://IL_TUO_PROGETTO.supabase.co'; // ← SOSTITUISCI
 
-// Dati di Sinergie (usati nel testo degli SMS e delle email)
+
+// ┌───────────────────────────────────────────────────────────────────┐
+// │  BLOCCO 2 — SUPABASE SERVICE ROLE KEY  (chiave segreta admin)     │
+// │  Dove trovarla: Supabase → Project Settings → API → service_role  │
+// │  ⚠  NON usare la anon key qui — serve la service_role key         │
+// │  ⚠  Non condividere questa chiave pubblicamente                   │
+// └───────────────────────────────────────────────────────────────────┘
+const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.LA_TUA_SERVICE_ROLE_KEY'; // ← SOSTITUISCI
+
+
+// ┌───────────────────────────────────────────────────────────────────┐
+// │  BLOCCO 3 — TWILIO  (per inviare SMS di risposta alle clienti)    │
+// │  Account SID e Auth Token: twilio.com/console → Account Info      │
+// │  From: il numero Twilio che hai acquistato (formato +39...)        │
+// │  Crea account gratuito su: twilio.com/try-twilio                  │
+// └───────────────────────────────────────────────────────────────────┘
+const TWILIO_SID   = 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'; // ← Account SID Twilio
+const TWILIO_TOKEN = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';   // ← Auth Token Twilio
+const TWILIO_FROM  = '+39000000000';                       // ← Numero mittente Twilio
+
+
+// ┌───────────────────────────────────────────────────────────────────┐
+// │  BLOCCO 4 — DATI SINERGIE  (usati nei testi di SMS ed email)      │
+// │  Questi dati sono già corretti — modificali solo se cambiano.      │
+// └───────────────────────────────────────────────────────────────────┘
 const SINERGIE_NOME  = 'Estetica Sinergie — Barbara';
 const SINERGIE_TEL   = '+39 0464 712994';
 const SINERGIE_EMAIL = 'esteticasinergierovereto@gmail.com';
 
-// ════════════════════════════════════════════════════════════════
+
+// ════════════════════════════════════════════════════════════════════
 //  SUPABASE INIT
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// ── Utility ──────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
-// ════════════════════════════════════════════════════════════════
-//  AUTH
-// ════════════════════════════════════════════════════════════════
-let mfaFactorId = null;
+// ════════════════════════════════════════════════════════════════════
+//  AUTH  — copiato da raminel-admin.html
+//  Flusso: email+password → signInWithPassword → (se MFA) OTP
+// ════════════════════════════════════════════════════════════════════
+let mfaFactorId = null; // usato se MFA challenge è richiesto
 
 async function checkSession() {
   const { data: { session } } = await supabase.auth.getSession();
@@ -212,19 +231,21 @@ $('authEmail').addEventListener('keydown',    e => { if (e.key === 'Enter') doLo
 $('authPassword').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
 async function doLogin() {
-  const btn  = $('authLoginBtn');
+  const btn   = $('authLoginBtn');
   const errEl = $('authError');
   const email = $('authEmail').value.trim();
-  const pw    = $('authPassword').value;
-  if (!email || !pw) { showAuthErr(errEl, 'Inserisci email e password.'); return; }
+  const password = $('authPassword').value;
+  if (!email || !password) { showAuthErr(errEl, 'Inserisci email e password.'); return; }
 
-  btn.disabled = true; btn.textContent = 'Accesso…';
+  btn.disabled = true; btn.textContent = 'Accesso in corso…';
   errEl.classList.remove('show');
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
   btn.disabled = false; btn.textContent = 'Accedi';
 
   if (error) {
+    // Se Supabase richiede MFA lancia handleMFA, altrimenti mostra errore
     if (error.message?.includes('mfa') || error.code === 'mfa_required') {
       await handleMFA();
     } else {
@@ -236,11 +257,18 @@ async function doLogin() {
 }
 
 async function handleMFA() {
+  // Recupera i fattori MFA registrati per questo utente
   const { data: factors } = await supabase.auth.mfa.listFactors();
   const totp = factors?.totp?.[0];
   if (!totp) { showAuthErr($('authError'), 'MFA richiesto ma nessun fattore trovato.'); return; }
+
   mfaFactorId = totp.id;
-  await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
+
+  // Avvia la challenge MFA (invia codice OTP)
+  const { data: challenge, error: cErr } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
+  if (cErr) { showAuthErr($('authError'), cErr.message); return; }
+
+  // Mostra il campo OTP
   $('otpStep').classList.add('show');
   $('authOtp').focus();
 }
@@ -249,28 +277,38 @@ $('authOtpBtn').addEventListener('click', doVerifyOtp);
 $('authOtp').addEventListener('keydown', e => { if (e.key === 'Enter') doVerifyOtp(); });
 
 async function doVerifyOtp() {
-  const btn  = $('authOtpBtn');
+  const btn   = $('authOtpBtn');
   const errEl = $('otpError');
   const code  = $('authOtp').value.trim();
   if (!code) { showAuthErr(errEl, 'Inserisci il codice.'); return; }
+
   btn.disabled = true; btn.textContent = 'Verifica…';
-  const { error } = await supabase.auth.mfa.verify({ factorId: mfaFactorId, challengeId: mfaFactorId, code });
+
+  const { error } = await supabase.auth.mfa.verify({
+    factorId:    mfaFactorId,
+    challengeId: mfaFactorId, // riutilizzato nel flusso semplice
+    code,
+  });
+
   btn.disabled = false; btn.textContent = 'Verifica codice';
+
   if (error) { showAuthErr(errEl, 'Codice non valido. Riprova.'); return; }
   showApp();
 }
 
-function showAuthErr(el, msg) { el.textContent = msg; el.classList.add('show'); }
+function showAuthErr(el, msg) {
+  el.textContent = msg; el.classList.add('show');
+}
 
 $('btnLogout').addEventListener('click', async () => {
   await supabase.auth.signOut();
   location.reload();
 });
 
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 //  APP STATE
-// ════════════════════════════════════════════════════════════════
-let allDomande  = [];
+// ════════════════════════════════════════════════════════════════════
+let allDomande   = [];
 let activeFilter = 'all';
 let searchQuery  = '';
 
@@ -281,9 +319,9 @@ function showApp() {
   subscribeRealtime();
 }
 
-// ════════════════════════════════════════════════════════════════
-//  LOAD DATA
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+//  CARICAMENTO DOMANDE DA SUPABASE
+// ════════════════════════════════════════════════════════════════════
 async function loadDomande() {
   $('domandeList').innerHTML =
     '<div class="loading-state"><span class="mini-spinner"></span>Caricamento domande…</div>';
@@ -294,8 +332,12 @@ async function loadDomande() {
     .order('created_at', { ascending: false });
 
   if (error) {
+    console.error('[domande] Supabase error:', error);
     $('domandeList').innerHTML =
-      `<div class="loading-state" style="color:var(--red-lt)">Errore: ${error.message}</div>`;
+      `<div class="loading-state" style="color:var(--red-lt)">
+         Errore: ${error.message}<br>
+         <small style="opacity:.6">Controlla la console del browser e le credenziali Supabase.</small>
+       </div>`;
     return;
   }
 
@@ -304,12 +346,12 @@ async function loadDomande() {
   render();
 }
 
-// ════════════════════════════════════════════════════════════════
-//  REALTIME — nuove domande senza refresh
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+//  REALTIME — notifica quando arriva una nuova domanda dal sito
+// ════════════════════════════════════════════════════════════════════
 function subscribeRealtime() {
   supabase
-    .channel('domande-channel')
+    .channel('domande-realtime')
     .on('postgres_changes',
       { event: 'INSERT', schema: 'public', table: 'domande' },
       payload => {
@@ -321,9 +363,9 @@ function subscribeRealtime() {
     .subscribe();
 }
 
-// ════════════════════════════════════════════════════════════════
-//  FILTER TABS
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+//  FILTRI
+// ════════════════════════════════════════════════════════════════════
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     activeFilter = btn.dataset.filter;
@@ -338,9 +380,9 @@ $('searchInput').addEventListener('input', function() {
   render();
 });
 
-// ════════════════════════════════════════════════════════════════
-//  STATS
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+//  STATS BAR
+// ════════════════════════════════════════════════════════════════════
 function updateStats() {
   const todayYMD = new Date().toISOString().slice(0, 10);
   const nuove    = allDomande.filter(d => d.stato === 'nuova');
@@ -352,18 +394,18 @@ function updateStats() {
   $('statOggi').textContent     = oggi.length;
   $('statRisposte').textContent = risposte.length;
 
-  // Badge filter tabs
   $('badgeAll').textContent      = allDomande.length;
   $('badgeNuove').textContent    = nuove.length;
   $('badgeLette').textContent    = allDomande.filter(d => d.stato === 'letta').length;
   $('badgeRisposte').textContent = risposte.length;
 }
 
-// ════════════════════════════════════════════════════════════════
-//  RENDER
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+//  RENDER LISTA
+// ════════════════════════════════════════════════════════════════════
 function render() {
   const list = $('domandeList');
+
   const filtered = allDomande.filter(d => {
     const matchFilter = activeFilter === 'all' || d.stato === activeFilter;
     const matchSearch = !searchQuery ||
@@ -384,7 +426,10 @@ function render() {
 
 function renderCard(d) {
   const dt = d.created_at
-    ? new Date(d.created_at).toLocaleString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+    ? new Date(d.created_at).toLocaleString('it-IT', {
+        day:'2-digit', month:'2-digit', year:'numeric',
+        hour:'2-digit', minute:'2-digit'
+      })
     : '—';
 
   const servizioHtml = d.servizio
@@ -395,23 +440,23 @@ function renderCard(d) {
   const telHtml = d.telefono
     ? `<a href="tel:${esc(d.telefono)}" class="domanda-contact-chip">
          <span>📞</span>${esc(d.telefono)}</a>` : '';
+
   const emailHtml = d.email
     ? `<a href="mailto:${esc(d.email)}" class="domanda-contact-chip">
          <span>✉</span>${esc(d.email)}</a>` : '';
 
-  // Risposta già inviata
+  // Risposta già registrata
   const rispostaHtml = d.risposta
     ? `<div class="domanda-risposta-data">
-         Risposta inviata il ${new Date(d.risposta_at).toLocaleString('it-IT', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+         Risposta inviata il ${new Date(d.risposta_at).toLocaleString('it-IT', {
+           day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'
+         })}
        </div>
        <div class="domanda-risposta-text">${esc(d.risposta)}</div>` : '';
 
-  // Pulsante "Segna letta" — disabilitato se già letta o risposta
   const lettaDisabled = d.stato !== 'nuova' ? 'disabled' : '';
   const lettaLabel    = d.stato === 'nuova' ? 'Segna come letta' : 'Letta';
-
-  // SMS — disabilitato se no telefono
-  const smsDisabled = d.telefono ? '' : 'disabled title="Nessun numero di telefono"';
+  const smsDisabled   = d.telefono ? '' : 'disabled title="Nessun numero di telefono fornito"';
 
   return `
 <div class="domanda-card ${d.stato}" data-id="${d.id}">
@@ -436,8 +481,8 @@ function renderCard(d) {
       <textarea class="reply-textarea" data-id="${d.id}"
         placeholder="Scrivi qui la risposta a ${esc(d.nome)}…">${d.risposta ? esc(d.risposta) : ''}</textarea>
       <div class="reply-btns">
-        <button class="btn-sms" data-id="${d.id}" data-tel="${esc(d.telefono || '')}"
-          data-nome="${esc(d.nome)}" ${smsDisabled}>
+        <button class="btn-sms" data-id="${d.id}"
+          data-tel="${esc(d.telefono || '')}" data-nome="${esc(d.nome)}" ${smsDisabled}>
           📱 Invia via SMS
         </button>
         <button class="btn-email" data-id="${d.id}"
@@ -453,17 +498,17 @@ function renderCard(d) {
 </div>`;
 }
 
-// ════════════════════════════════════════════════════════════════
-//  CARD EVENT LISTENERS
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+//  EVENT LISTENERS DELLE CARD
+// ════════════════════════════════════════════════════════════════════
 function attachCardListeners() {
-  // Toggle open/close + segna come letta
+
+  // Apri/chiudi card + segna automaticamente come "letta"
   document.querySelectorAll('.domanda-header').forEach(header => {
     header.addEventListener('click', async () => {
       const card = header.closest('.domanda-card');
       card.classList.toggle('open');
 
-      // Segna come "letta" automaticamente quando si apre per la prima volta
       if (card.classList.contains('open')) {
         const id = card.dataset.id;
         const d  = allDomande.find(x => x.id === id);
@@ -474,7 +519,7 @@ function attachCardListeners() {
     });
   });
 
-  // Pulsante "Segna come letta" manuale
+  // Pulsante manuale "Segna come letta"
   document.querySelectorAll('.btn-letta').forEach(btn => {
     btn.addEventListener('click', async e => {
       e.stopPropagation();
@@ -485,11 +530,12 @@ function attachCardListeners() {
     });
   });
 
-  // Pulsante SMS
+  // Pulsante SMS — invia via Twilio
   document.querySelectorAll('.btn-sms').forEach(btn => {
     btn.addEventListener('click', async e => {
       e.stopPropagation();
       if (btn.disabled) return;
+
       const id    = btn.dataset.id;
       const tel   = btn.dataset.tel;
       const nome  = btn.dataset.nome;
@@ -501,7 +547,7 @@ function attachCardListeners() {
       if (!tel)   { showToast('La cliente non ha fornito un numero di telefono.', 'orange'); return; }
 
       btn.disabled = true; btn.textContent = 'Invio…';
-      const ok = await sendSMS(tel, nome, testo);
+      const ok = await sendSMSTwilio(tel, nome, testo);
       btn.disabled = false; btn.textContent = '📱 Invia via SMS';
 
       if (ok) {
@@ -511,10 +557,11 @@ function attachCardListeners() {
     });
   });
 
-  // Pulsante Email — apre mailto: con risposta precompilata
+  // Pulsante Email — apre client email con testo precompilato
   document.querySelectorAll('.btn-email').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
+
       const id    = btn.dataset.id;
       const email = btn.dataset.email;
       const nome  = btn.dataset.nome;
@@ -529,9 +576,9 @@ function attachCardListeners() {
         return;
       }
 
-      const subject = encodeURIComponent(`Risposta dalla tua richiesta — ${SINERGIE_NOME}`);
+      const subject = encodeURIComponent(`Risposta alla tua richiesta — ${SINERGIE_NOME}`);
       const body    = encodeURIComponent(
-        `Ciao ${nome},\n\n${testo}\n\nA presto,\nBarbara\n${SINERGIE_NOME}\n${SINERGIE_TEL}`
+        `Ciao ${nome},\n\n${testo}\n\nA presto,\nBarbara\n${SINERGIE_NOME}\nTel: ${SINERGIE_TEL}`
       );
       window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
 
@@ -543,9 +590,9 @@ function attachCardListeners() {
   });
 }
 
-// ════════════════════════════════════════════════════════════════
-//  SUPABASE ACTIONS
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
+//  AZIONI SUPABASE
+// ════════════════════════════════════════════════════════════════════
 async function aggiornaStato(id, nuovoStato) {
   const { error } = await supabase
     .from('domande')
@@ -554,17 +601,19 @@ async function aggiornaStato(id, nuovoStato) {
 
   if (error) { showToast('Errore aggiornamento stato.', 'red'); return; }
 
+  // Aggiorna in memoria
   const d = allDomande.find(x => x.id === id);
   if (d) d.stato = nuovoStato;
   updateStats();
 
-  // Aggiorna solo la card visiva (no full re-render)
-  const card  = document.querySelector(`.domanda-card[data-id="${id}"]`);
+  // Aggiorna badge e classe della card senza re-render completo
+  const card = document.querySelector(`.domanda-card[data-id="${id}"]`);
   if (!card) return;
   card.className = `domanda-card ${nuovoStato} open`;
+
   const badge = card.querySelector('.badge-domanda');
   if (badge) {
-    badge.className  = `badge-domanda ${nuovoStato}`;
+    badge.className   = `badge-domanda ${nuovoStato}`;
     badge.textContent = { nuova:'🟡 Nuova', letta:'Letta', risposta:'✓ Risposta' }[nuovoStato];
   }
   const btnLetta = card.querySelector('.btn-letta');
@@ -589,10 +638,13 @@ async function salvaRisposta(id, testo) {
   return true;
 }
 
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 //  TWILIO SMS
-// ════════════════════════════════════════════════════════════════
-async function sendSMS(tel, nome, testo) {
+//  Nota: le credenziali Twilio sono visibili nel sorgente JS del browser.
+//  Per un uso professionale considera una Supabase Edge Function che
+//  nasconde le credenziali lato server.
+// ════════════════════════════════════════════════════════════════════
+async function sendSMSTwilio(tel, nome, testo) {
   const url    = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`;
   const body   = `${SINERGIE_NOME} risponde a ${nome}:\n\n${testo}\n\nPer info: ${SINERGIE_TEL}`;
   const params = new URLSearchParams({ To: tel, From: TWILIO_FROM, Body: body });
@@ -614,19 +666,19 @@ async function sendSMS(tel, nome, testo) {
     return true;
 
   } catch (err) {
-    showToast(`SMS non inviato — ${err.message}. Usa il pulsante Email o contatta il cliente manualmente.`, 'red');
+    showToast(`SMS non inviato — ${err.message}. Usa il pulsante Email o contatta il cliente manualmente al ${tel}`, 'red');
     return false;
   }
 }
 
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 //  UTILS
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 function esc(str) {
   if (!str) return '';
   return String(str)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function showToast(msg, type = 'green') {
@@ -638,9 +690,9 @@ function showToast(msg, type = 'green') {
   t._timer = setTimeout(() => t.classList.remove('show'), 6000);
 }
 
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 //  INIT
-// ════════════════════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════════════
 checkSession();
 </script>
 </body>
