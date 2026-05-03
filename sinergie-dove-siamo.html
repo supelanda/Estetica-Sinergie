@@ -267,10 +267,15 @@
         <h2>Hai una <em>domanda?</em></h2>
         <!-- TESTO: modifica qui il testo introduttivo del form -->
         <p style="margin-top:.8rem;">Prenota un appuntamento, chiedi informazioni su un trattamento o semplicemente dicci cosa ti serve. Barbara risponde di persona.</p>
-        <p style="margin-top:1.2rem;font-size:.85rem;color:var(--muted);font-weight:300;">Il form aprirà il tuo client email con tutti i campi già compilati.</p>
+        <p style="margin-top:1.2rem;font-size:.85rem;color:var(--muted);font-weight:300;">Barbara risponde di persona — di solito entro poche ore.</p>
       </div>
       <div class="contact-form reveal">
-        <!-- PERSONALIZZA: il form usa mailto: — modifica i campi select con i tuoi servizi reali -->
+        <!-- PERSONALIZZA: form collegato a Supabase — inserisci SUPABASE_URL e SUPABASE_ANON_KEY nello script in fondo -->
+        <div id="formSuccess" style="display:none;padding:1.5rem;border:1px solid rgba(196,131,122,.3);background:rgba(196,131,122,.07);">
+          <p style="font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-style:italic;color:var(--cream);">Grazie, <span id="formNomeSent"></span>!</p>
+          <p style="font-size:.88rem;color:var(--muted);margin-top:.4rem;">La tua richiesta è arrivata. Barbara ti risponderà presto.</p>
+        </div>
+        <div id="formError" style="display:none;padding:.8rem 1rem;border:1px solid rgba(200,80,60,.3);background:rgba(200,80,60,.06);color:#d97060;font-size:.88rem;font-style:italic;margin-bottom:1rem;"></div>
         <form id="contactForm">
           <div class="form-row">
             <div class="form-group">
@@ -281,6 +286,10 @@
               <label for="telefono">Telefono</label>
               <input type="tel" id="telefono" name="telefono" placeholder="Il tuo numero">
             </div>
+          </div>
+          <div class="form-group">
+            <label for="email-cliente">Email (opzionale)</label>
+            <input type="email" id="email-cliente" name="email" placeholder="Per ricevere la risposta via email">
           </div>
           <!-- TESTO: modifica qui le opzioni di servizio nella select -->
           <div class="form-group">
@@ -304,7 +313,7 @@
             <label for="messaggio">Messaggio</label>
             <textarea id="messaggio" name="messaggio" placeholder="Dicci pure tutto — orari preferiti, domande, curiosità…" rows="4"></textarea>
           </div>
-          <button type="submit" class="form-submit">Invia richiesta →</button>
+          <button type="submit" class="form-submit" id="formSubmitBtn">Invia richiesta →</button>
         </form>
       </div>
     </div>
@@ -383,47 +392,91 @@
   </div>
 </footer>
 
-<script>
-  const nav = document.getElementById('nav');
-  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
-  document.getElementById('navHamburger').addEventListener('click', function() {
-    const open = nav.classList.toggle('nav-open');
-    this.setAttribute('aria-expanded', open);
-  });
-  document.addEventListener('click', e => { if (!nav.contains(e.target)) nav.classList.remove('nav-open'); });
+<script type="module">
+// ════════════════════════════════════════════════════════════
+//  SUPABASE CONFIG — inserisci qui i tuoi dati
+//  Trova SUPABASE_URL e SUPABASE_ANON_KEY in:
+//  Supabase → Project Settings → API → URL + anon (public)
+// ════════════════════════════════════════════════════════════
+const SUPABASE_URL      = 'https://YOUR_PROJECT.supabase.co'; // ← sostituisci
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.YOUR_ANON_KEY'; // ← sostituisci
 
-  /* Reveal on scroll */
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-  }, { threshold:0.08 });
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  /* Oggi evidenziato */
-  const days = ['h-dom','h-lun','h-mar','h-mer','h-gio','h-ven','h-sab'];
-  const todayId = days[new Date().getDay()];
-  const todayRow = document.getElementById(todayId);
-  if (todayRow && !todayRow.classList.contains('closed')) {
-    todayRow.classList.add('today');
-    const dayEl = todayRow.querySelector('.day');
-    dayEl.innerHTML += ' <span class="today-badge">Oggi</span>';
+// ── Nav scroll ───────────────────────────────────────────────
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+document.getElementById('navHamburger').addEventListener('click', function() {
+  const open = nav.classList.toggle('nav-open');
+  this.setAttribute('aria-expanded', open);
+});
+document.addEventListener('click', e => { if (!nav.contains(e.target)) nav.classList.remove('nav-open'); });
+
+// ── Reveal on scroll ─────────────────────────────────────────
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+}, { threshold:0.08 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── Oggi evidenziato negli orari ─────────────────────────────
+const days = ['h-dom','h-lun','h-mar','h-mer','h-gio','h-ven','h-sab'];
+const todayId  = days[new Date().getDay()];
+const todayRow = document.getElementById(todayId);
+if (todayRow && !todayRow.classList.contains('closed')) {
+  todayRow.classList.add('today');
+  const dayEl = todayRow.querySelector('.day');
+  dayEl.innerHTML += ' <span class="today-badge">Oggi</span>';
+}
+
+// ════════════════════════════════════════════════════════════
+//  FORM → SUPABASE
+//  Invia i dati della cliente nella tabella "domande"
+// ════════════════════════════════════════════════════════════
+const form       = document.getElementById('contactForm');
+const submitBtn  = document.getElementById('formSubmitBtn');
+const formSuccess = document.getElementById('formSuccess');
+const formError   = document.getElementById('formError');
+const formNomeSent = document.getElementById('formNomeSent');
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  const nome     = document.getElementById('nome').value.trim();
+  const telefono = document.getElementById('telefono').value.trim();
+  const email    = document.getElementById('email-cliente')?.value.trim() || '';
+  const servizio = document.getElementById('servizio').value;
+  const messaggio = document.getElementById('messaggio').value.trim();
+
+  // Validazione minima
+  if (!nome || !messaggio) return;
+
+  // Stato caricamento
+  submitBtn.disabled    = true;
+  submitBtn.textContent = 'Invio in corso…';
+  formError.style.display = 'none';
+
+  // Inserimento in Supabase
+  const { error } = await supabase
+    .from('domande')
+    .insert([{ nome, telefono, email, servizio, messaggio }]);
+
+  submitBtn.disabled    = false;
+  submitBtn.textContent = 'Invia richiesta →';
+
+  if (error) {
+    // Errore Supabase — mostra messaggio + fallback mailto
+    console.error('[form] Supabase error:', error);
+    formError.style.display = 'block';
+    formError.textContent = `Errore di invio (${error.message}). Usa il numero di telefono o scrivici via email.`;
+    return;
   }
 
-  /* Form mailto */
-  document.getElementById('contactForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const nome     = document.getElementById('nome').value;
-    const telefono = document.getElementById('telefono').value;
-    const servizio = document.getElementById('servizio').value;
-    const msg      = document.getElementById('messaggio').value;
-
-    /* PERSONALIZZA: modifica l'indirizzo email destinatario qui sotto */
-    const email = 'esteticasinergierovereto@gmail.com';
-    const subject = encodeURIComponent(`Richiesta appuntamento — ${nome}`);
-    const body = encodeURIComponent(
-      `Ciao Barbara,\n\nNome: ${nome}\nTelefono: ${telefono}\nServizio: ${servizio}\n\nMessaggio:\n${msg}\n\nGrazie!`
-    );
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-  });
+  // Successo
+  form.style.display          = 'none';
+  formSuccess.style.display   = 'block';
+  formNomeSent.textContent    = nome;
+});
 </script>
 </body>
 </html>
