@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- TESTO: modifica qui il titolo del tab del browser -->
+<title>Sinergie — Estetica Di Tosin Barbara · Rovereto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sinergie-base.css">
+<link rel="stylesheet" href="sinergie-responsive.css">
+<style>
+
+/* ════════════════════════════════════════
+   HERO — full-width asimmetrico
+   Testo su 44% a sinistra.
+   "SINERGIE" ruotato verticalmente come sfondo.
+   Pull-quote integrata sotto il titolo (linea sx).
+════════════════════════════════════════ */
+.hero {
+  position:relative;
+  min-height:100vh; z-index:1;
+  background:linear-gradient(158deg,#1a1014 0%,#2b1a1e 55%,#221619 100%);
+  display:flex; align-items:center;
+  overflow:hidden;
+}
+/* Alone caldo a sinistra */
+.hero::before {
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(ellipse 55% 75% at 18% 52%,
+    rgba(196,131,122,.07) 0%,transparent 65%);
+  pointer-events:none;
+}
+/* Linea verticale sottile — separa testo da sfondo deco */
+.hero::after {
+  content:''; position:absolute;
+  left:46%; top:10%; bottom:10%; width:1px;
+  background:linear-gradient(to bottom,
+    transparent, var(--border) 18%, var(--border) 82%, transparent);
+  pointer-events:none;
+}
+
+.hero-inner {
+  max-width:1200px; margin:0 auto;
+  padding:9rem 4rem 7rem 4.5rem;
+  width:100%; position:relative; z-index:2;
+}
+.hero-text { max-width:43%; }
+
+/* TESTO: modifica qui l'eyebrow */
+.hero-eyebrow {
+  font-size:.62rem; font-weight:600; letter-spacing:.44em; text-transform:uppercase;
+  color:var(--rose); margin-bottom:1.8rem;
+  display:flex; align-items:center; gap:.9rem;
+  opacity:0; animation:fadeUp .8s .1s forwards;
+}
+.hero-eyebrow::before { content:''; width:22px; height:1px; background:var(--rose); flex-shrink:0; }
+
+/* TESTO: modifica qui il titolo principale */
+.hero-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(3.8rem,6.8vw,7.2rem);
+  line-height:.87; font-weight:300; color:var(--cream);
+  opacity:0; animation:fadeUp .9s .25s forwards;
+}
+.hero-title em  { font-style:italic; color:var(--gold); display:block; }
+.hero-title span {
+  display:block; font-size:.5em; color:var(--rose-lt);
+  letter-spacing:.05em; margin-top:.35em;
+}
+
+/* Pull-quote integrata con bordo sinistro */
+/* TESTO: modifica qui la citazione hero */
+.hero-pull-quote {
+  margin-top:2.6rem; padding-left:1.5rem;
+  border-left:2px solid var(--rose);
+  opacity:0; animation:fadeUp .85s .5s forwards;
+}
+.hero-pull-quote blockquote {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.08rem; font-style:italic;
+  color:var(--warm); line-height:1.65;
+}
+/* TESTO: modifica qui il nome autore */
+.hero-pull-quote cite {
+  display:block; margin-top:.6rem;
+  font-family:'Jost',sans-serif; font-size:.62rem; font-weight:500;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:var(--rose); opacity:.75; font-style:normal;
+}
+
+.hero-actions {
+  display:flex; gap:1rem; margin-top:2.8rem; flex-wrap:wrap;
+  opacity:0; animation:fadeUp .8s .7s forwards;
+}
+
+.hero-badge {
+  position:absolute; bottom:3rem; left:4.5rem;
+  display:flex; align-items:center; gap:.9rem;
+  opacity:0; animation:fadeUp .8s 1.1s forwards;
+}
+.hero-badge-stars { color:var(--gold); font-size:.88rem; }
+.hero-badge-sep   { width:1px; height:16px; background:var(--border); }
+/* TESTO: modifica qui il badge recensioni */
+.hero-badge-text  { font-size:.74rem; color:var(--muted); font-weight:400; }
+
+/* "SINERGIE" verticale — sfondo decorativo a piena altezza */
+.hero-vert-deco {
+  position:absolute; right:0; top:50%;
+  transform:translateY(-50%) rotate(90deg);
+  transform-origin:center center;
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:clamp(8rem,16vw,19rem); line-height:1;
+  color:var(--rose); opacity:.04;
+  letter-spacing:.14em;
+  pointer-events:none; user-select:none;
+  white-space:nowrap; z-index:1;
+}
+/* Cerchio decorativo a destra */
+.hero-ring {
+  position:absolute; right:9%; top:50%; transform:translateY(-50%);
+  width:380px; height:380px; border-radius:50%;
+  border:1px solid rgba(196,131,122,.06);
+  pointer-events:none; z-index:1;
+}
+.hero-ring::before {
+  content:''; position:absolute; inset:50px; border-radius:50%;
+  border:1px solid rgba(201,169,110,.04);
+}
+
+
+/* ════════════════════════════════════════
+   CHI SIAMO — layout a Z
+   Riga 1: testo sx (60%) + frame dx (40%)
+   Riga 2: pull-quote centrata con virgolette grandi
+   Riga 3: feature tags centrate
+════════════════════════════════════════ */
+.about { padding:9rem 0 7rem; border-top:1px solid var(--border); }
+
+.about-z-top {
+  display:grid; grid-template-columns:1fr .68fr;
+  gap:5rem; align-items:start; margin-bottom:6rem;
+}
+.about-content {}
+
+/* TESTO: modifica qui la citazione introduttiva */
+.about-intro {
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.28rem; font-style:italic;
+  color:var(--cream); line-height:1.65;
+  margin-bottom:1.8rem;
+  padding-bottom:1.6rem; border-bottom:1px solid var(--border-s);
+}
+.about-body { font-size:.95rem; color:var(--muted); line-height:1.9; margin-bottom:1rem; font-weight:300; }
+
+.about-visual { position:relative; }
+/* FOTO: foto di Barbara — dimensioni consigliate 600x800px */
+.about-frame {
+  width:100%; aspect-ratio:4/5;
+  background:linear-gradient(145deg,var(--panel) 0%,var(--panel-lt) 40%,var(--deep) 100%);
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden;
+  transform:rotate(1.2deg);
+  box-shadow:18px 28px 80px rgba(0,0,0,.4);
+}
+.about-frame-text { text-align:center; padding:2.5rem; position:relative; z-index:1; }
+/* TESTO: modifica qui la citazione nel frame */
+.about-frame-text blockquote {
+  font-family:'Cormorant Garamond',serif; font-size:1.1rem; font-style:italic;
+  color:var(--cream); line-height:1.65;
+}
+.about-frame-text cite {
+  display:block; margin-top:1rem;
+  font-family:'Jost',sans-serif; font-size:.62rem; font-weight:500;
+  letter-spacing:.2em; text-transform:uppercase; color:var(--rose);
+}
+/* Badge in basso a destra (opposto all'originale) */
+.about-badge-float {
+  position:absolute; bottom:-1.2rem; right:-1.2rem;
+  width:96px; height:96px; background:var(--rose);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:var(--cream); border-radius:2px;
+  box-shadow:0 10px 28px rgba(196,131,122,.3);
+  transform:rotate(1.8deg);
+}
+/* TESTO: modifica qui gli anni */
+.about-badge-float .big-num { font-family:'Cormorant Garamond',serif; font-size:2rem; line-height:1; font-style:italic; }
+.about-badge-float .small-txt { font-size:.5rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; text-align:center; line-height:1.4; }
+
+/* Blocco citazione centrata con virgolette enormi */
+.about-centered-quote {
+  max-width:680px; margin:0 auto 5rem;
+  text-align:center; position:relative; padding:0 2.5rem;
+}
+.about-centered-quote::before,
+.about-centered-quote::after {
+  font-family:'Cormorant Garamond',serif;
+  font-size:9rem; line-height:.5;
+  color:var(--rose); opacity:.11;
+  position:absolute;
+}
+.about-centered-quote::before { content:'\201C'; top:.3rem; left:0; }
+.about-centered-quote::after  { content:'\201D'; bottom:-2rem; right:0; }
+/* TESTO: modifica qui la citazione grande centrata */
+.about-centered-quote blockquote {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.35rem,2.4vw,1.75rem);
+  font-style:italic; font-weight:300;
+  color:var(--cream); line-height:1.5; position:relative; z-index:1;
+}
+/* TESTO: modifica qui l'attribuzione */
+.about-centered-quote cite {
+  display:block; margin-top:1.1rem;
+  font-family:'Jost',sans-serif; font-size:.64rem; font-weight:500;
+  letter-spacing:.24em; text-transform:uppercase; color:var(--rose);
+  font-style:normal;
+}
+
+/* Feature tags centrate in fondo */
+.about-features-center {
+  display:flex; flex-wrap:wrap; gap:.55rem; justify-content:center;
+  max-width:660px; margin:0 auto;
+}
+.feature-tag {
+  display:flex; align-items:center; gap:.6rem; padding:.6rem 1.1rem;
+  border:1px solid var(--border);
+  font-size:.68rem; font-weight:500; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); transition:border-color .25s, color .25s;
+}
+.feature-tag:hover { border-color:var(--rose); color:var(--rose-lt); }
+.feature-tag .icon { color:var(--rose); font-style:normal; }
+
+
+/* ════════════════════════════════════════
+   SERVIZI — tab orizzontali editoriali,
+   prima card featured full-width,
+   resto in griglia 2-col asimmetrica
+════════════════════════════════════════ */
+.services-preview {
+  padding:9rem 0; border-top:1px solid var(--border);
+  background:linear-gradient(to bottom,transparent,rgba(22,10,14,.3),transparent);
+}
+.services-preview-head { margin-bottom:2.8rem; }
+
+/* Tab bar orizzontale — stile editoriale con underline attivo */
+.services-tab-bar {
+  display:flex; border-bottom:1px solid var(--border);
+  margin-bottom:3rem;
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.services-tab-bar::-webkit-scrollbar { display:none; }
+.services-tab-btn {
+  font-family:'Jost',sans-serif; font-size:.7rem; font-weight:600;
+  letter-spacing:.22em; text-transform:uppercase;
+  background:transparent; color:var(--muted); border:none;
+  padding:.85rem 1.6rem .85rem 0;
+  margin-right:1.8rem;
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+  transition:color .25s, border-color .25s;
+  white-space:nowrap; flex-shrink:0;
+}
+.services-tab-btn:hover { color:var(--rose-lt); }
+.services-tab-btn.active { color:var(--cream); border-bottom-color:var(--rose); }
+
+/* Griglia asimmetrica: prima card full-width, poi 2-col */
+.services-preview-grid {
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:1px; background:var(--border); border:1px solid var(--border);
+  transition:opacity .3s ease;
+}
+.services-preview-grid.fading { opacity:0; }
+
+/* Prima card — featured, occupa tutta la riga */
+.service-card:first-child {
+  grid-column:1 / -1;
+  display:grid; grid-template-columns:1fr .8fr;
+  gap:2rem; align-items:center;
+  padding:2.8rem 2.5rem;
+}
+.service-card:first-child .sc-right {
+  display:flex; flex-direction:column; align-items:flex-end; gap:.8rem;
+}
+.service-card:first-child .service-card-price { font-size:1.6rem; }
+/* Quarta card — si estende su 2 righe */
+.service-card:nth-child(4) { grid-row:span 2; display:flex; flex-direction:column; justify-content:flex-end; }
+
+/* Card base */
+.service-card {
+  background:var(--panel); padding:2rem 1.8rem;
+  transition:background .25s, transform .25s, box-shadow .25s;
+  position:relative; overflow:hidden; cursor:default;
+}
+.service-card::before {
+  content:''; position:absolute; inset:0;
+  border:2px solid transparent;
+  transition:border-color .3s;
+  pointer-events:none; z-index:1;
+}
+.service-card:hover { background:var(--panel-lt); transform:translateY(-3px); box-shadow:0 12px 40px rgba(196,131,122,.12); }
+.service-card:hover::before { border-color:rgba(196,131,122,.35); }
+
+.service-card-cat { font-family:'Jost',sans-serif; font-size:.58rem; font-weight:600; letter-spacing:.22em; text-transform:uppercase; color:var(--rose); margin-bottom:.5rem; display:block; }
+/* TESTO: modifica qui il nome del trattamento */
+.service-card-name { font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--cream); margin-bottom:.4rem; font-weight:400; }
+/* TESTO: modifica qui la descrizione del trattamento */
+.service-card-desc { font-size:.82rem; color:var(--muted); line-height:1.65; font-weight:300; }
+/* TESTO: modifica qui il prezzo */
+.service-card-price { margin-top:1.1rem; font-family:'Cormorant Garamond',serif; font-size:1rem; color:var(--gold); display:flex; align-items:baseline; gap:.4rem; }
+.service-card-price .from { font-family:'Jost',sans-serif; font-size:.6rem; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.service-special-tag { font-family:'Jost',sans-serif; font-size:.55rem; font-weight:700; letter-spacing:.16em; text-transform:uppercase; background:var(--rose); color:var(--cream); padding:.22rem .6rem; }
+/* nelle card normali il tag è absolute */
+.service-card:not(:first-child) .service-special-tag { position:absolute; top:.75rem; right:.75rem; z-index:2; }
+/* nella featured è inline */
+.service-card:first-child .service-special-tag { position:static; }
+
+
+/* ════════════════════════════════════════
+   STATS — composizione tipografica poetica
+   I 4 numeri fluiscono come versi su sfondo rose,
+   alternando indentatura sinistra/destra
+════════════════════════════════════════ */
+.stats-band {
+  background:var(--rose); padding:5.5rem 0;
+  position:relative; z-index:1; overflow:hidden;
+}
+/* Cerchio decorativo in background */
+.stats-band::before {
+  content:''; position:absolute;
+  width:560px; height:560px; border-radius:50%;
+  border:1px solid rgba(247,240,235,.07);
+  right:-100px; bottom:-180px; pointer-events:none;
+}
+
+.stats-poem { max-width:840px; margin:0 auto; padding:0 3.5rem; }
+
+.stats-verse {
+  display:flex; align-items:baseline; gap:1.4rem;
+  border-bottom:1px solid rgba(247,240,235,.1);
+  padding:.85rem 0;
+}
+.stats-verse:first-child { padding-top:0; }
+.stats-verse:last-child  { border-bottom:none; padding-bottom:0; }
+/* Alternanza posizioni */
+.stats-verse:nth-child(1) { justify-content:flex-start; }
+.stats-verse:nth-child(2) { justify-content:flex-end; padding-right:4%; }
+.stats-verse:nth-child(3) { justify-content:flex-start; padding-left:7%; }
+.stats-verse:nth-child(4) { justify-content:flex-end; }
+
+/* TESTO: modifica qui i numeri */
+.stat-num-v {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:clamp(3.6rem,7.5vw,6.8rem);
+  color:var(--cream); line-height:.88; flex-shrink:0;
+}
+.stats-verse-sep {
+  font-family:'Cormorant Garamond',serif; font-style:italic;
+  font-size:3rem; color:var(--cream); opacity:.14;
+  line-height:1; align-self:center;
+}
+.stat-text-v { display:flex; flex-direction:column; gap:.2rem; }
+/* TESTO: modifica qui le etichette */
+.stat-label-v { font-family:'Jost',sans-serif; font-size:.68rem; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--cream); opacity:.65; }
+/* TESTO: modifica qui le descrizioni */
+.stat-desc-v  { font-size:.78rem; color:var(--cream); opacity:.38; line-height:1.4; font-weight:300; }
+
+
+/* ════════════════════════════════════════
+   CAROUSEL — card con altezze alternate
+   align-items:flex-start sul track +
+   min-height variabile per effetto "onda"
+════════════════════════════════════════ */
+.reviews-section { padding:9rem 0; border-top:1px solid var(--border); }
+.reviews-head {
+  margin-bottom:3.5rem; display:flex;
+  justify-content:space-between; align-items:flex-end;
+  flex-wrap:wrap; gap:1rem;
+}
+.rev-wrap {
+  overflow:hidden; position:relative;
+  mask-image:linear-gradient(to right, transparent 0%, black 7%, black 93%, transparent 100%);
+  -webkit-mask-image:linear-gradient(to right, transparent 0%, black 7%, black 93%, transparent 100%);
+}
+.rev-track {
+  display:flex; gap:1.4rem; width:max-content;
+  animation:rev-scroll 55s linear infinite;
+  align-items:flex-start; /* card allineate in alto → altezze diverse creano onde */
+}
+.rev-track:hover { animation-play-state:paused; }
+@keyframes rev-scroll {
+  from { transform:translateX(0); }
+  to   { transform:translateX(-50%); }
+}
+
+/* TESTO: modifica qui ogni recensione */
+.rev-card {
+  flex-shrink:0; width:305px;
+  background:var(--panel); border:1px solid var(--border);
+  padding:1.9rem 1.8rem 1.7rem;
+  position:relative; overflow:hidden;
+  transition:border-color .25s, transform .25s;
+}
+.rev-card:hover { border-color:rgba(196,131,122,.4); transform:translateY(-3px); }
+.rev-card::before {
+  content:'\201C'; font-family:'Cormorant Garamond',serif;
+  font-size:5rem; line-height:.55; font-style:italic;
+  color:var(--rose); opacity:.1;
+  position:absolute; top:.5rem; left:1rem; pointer-events:none;
+}
+/* 7 varianti di altezza che si ripetono sul loop */
+.rev-card:nth-child(7n+1) { min-height:265px; }
+.rev-card:nth-child(7n+2) { min-height:188px; }
+.rev-card:nth-child(7n+3) { min-height:235px; }
+.rev-card:nth-child(7n+4) { min-height:200px; }
+.rev-card:nth-child(7n+5) { min-height:272px; }
+.rev-card:nth-child(7n+6) { min-height:182px; }
+.rev-card:nth-child(7n+7) { min-height:218px; }
+
+.rev-stars  { color:var(--gold); font-size:.82rem; letter-spacing:.08em; margin-bottom:.8rem; }
+.rev-text   { font-size:.86rem; font-style:italic; color:var(--warm); line-height:1.7; margin-bottom:1rem; font-weight:300; }
+/* TESTO: modifica qui il nome dell'autore */
+.rev-author { font-family:'Jost',sans-serif; font-size:.63rem; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+
+
+/* ════ RESPONSIVE ════ */
+@media (max-width:900px) {
+  /* Hero */
+  .hero::after { display:none; }
+  .hero-vert-deco { font-size:clamp(5rem,18vw,10rem); opacity:.03; }
+  .hero-inner { padding:8rem 1.5rem 5rem; }
+  .hero-text { max-width:100%; }
+  .hero-badge { left:1.5rem; }
+
+  /* About */
+  .about-z-top { grid-template-columns:1fr; gap:3rem; }
+  .about-visual { max-width:400px; }
+
+  /* Servizi */
+  .services-preview-grid { grid-template-columns:1fr; }
+  .service-card:first-child { grid-template-columns:1fr; gap:1.2rem; }
+  .service-card:first-child .sc-right { align-items:flex-start; }
+  .service-card:nth-child(4) { grid-row:span 1; }
+
+  /* Stats */
+  .stats-poem { padding:0 1.5rem; }
+  .stats-verse { flex-direction:column; gap:.35rem; }
+  .stats-verse:nth-child(2),
+  .stats-verse:nth-child(4) { padding-right:0; }
+  .stats-verse:nth-child(3) { padding-left:0; }
+  .stats-verse-sep { display:none; }
+}
+@media (max-width:600px) {
+  .hero-inner  { padding:7.5rem 1.4rem 4.5rem; }
+  .hero-title  { font-size:clamp(3rem,13vw,4.5rem) !important; }
+  .hero-actions .btn-primary,
+  .hero-actions .btn-outline { width:100%; text-align:center; }
+  .about { padding:5rem 0; }
+  .about-centered-quote::before,
+  .about-centered-quote::after { font-size:6rem; }
+  .stat-num-v { font-size:clamp(2.8rem,10vw,4.5rem); }
+  .services-tab-btn { font-size:.65rem; padding:.8rem 1rem .8rem 0; margin-right:1.2rem; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── NAVIGAZIONE ── -->
+<nav id="nav">
+  <div class="nav-links">
+    <!-- TESTO: modifica qui i link nav sinistri -->
+    <a href="sinergie-servizi.html">Servizi</a>
+    <a href="#about">Chi siamo</a>
+  </div>
+  <!-- TESTO: modifica qui il nome nel logo nav -->
+  <a href="index.html" class="nav-logo">Sinergie <em>·</em></a>
+  <div class="nav-links nav-links-right">
+    <a href="sinergie-recensioni.html">Recensioni</a>
+    <a href="sinergie-dove-siamo.html">Dove siamo</a>
+    <a href="sinergie-dove-siamo.html" class="nav-cta">Prenota ora →</a>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Apri menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <a href="sinergie-servizi.html">Servizi</a>
+    <a href="#about">Chi siamo</a>
+    <a href="sinergie-recensioni.html">Recensioni</a>
+    <a href="sinergie-dove-siamo.html">Dove siamo</a>
+    <a href="sinergie-dove-siamo.html" class="nav-mobile-cta">Prenota ora →</a>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════
+     HERO
+═══════════════════════════════ -->
+<section class="hero">
+  <div class="hero-ring" aria-hidden="true"></div>
+  <!-- "SINERGIE" ruotato verticalmente a piena altezza -->
+  <div class="hero-vert-deco" aria-hidden="true">SINERGIE</div>
+
+  <div class="hero-inner">
+    <div class="hero-text">
+      <!-- TESTO: modifica qui l'eyebrow -->
+      <p class="hero-eyebrow">Via Pasubio · Rovereto</p>
+      <!-- TESTO: modifica qui il titolo principale -->
+      <h1 class="hero-title">Bellezza<em>autentica.</em><span>Rovereto</span></h1>
+
+      <!-- Pull-quote integrata (non in colonna separata) -->
+      <!-- TESTO: modifica qui la citazione hero -->
+      <div class="hero-pull-quote">
+        <blockquote>"Barbara è una professionista nel suo lavoro. Gentile, solare, trasmette grande tranquillità."</blockquote>
+        <!-- TESTO: modifica qui il nome autore -->
+        <cite>— Cliente Sinergie</cite>
+      </div>
+
+      <div class="hero-actions">
+        <a href="sinergie-servizi.html" class="btn-primary">Scopri i trattamenti</a>
+        <a href="sinergie-dove-siamo.html" class="btn-outline">Prenota ora</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-badge">
+    <span class="hero-badge-stars">★★★★★</span>
+    <div class="hero-badge-sep"></div>
+    <!-- TESTO: modifica qui il badge recensioni -->
+    <span class="hero-badge-text">98% · 32 recensioni Facebook</span>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════
+     CHI SIAMO — layout Z
+═══════════════════════════════ -->
+<section class="about" id="about">
+  <div class="container">
+
+    <!-- Z riga 1: testo 60% + frame 40% -->
+    <div class="about-z-top">
+      <div class="about-content reveal">
+        <span class="section-eyebrow">Chi siamo</span>
+        <!-- TESTO: modifica qui il titolo chi siamo -->
+        <h2 class="section-title">Un'ora <em>solo per te.</em></h2>
+        <!-- TESTO: modifica qui la citazione intro -->
+        <p class="about-intro">"Da dieci anni accolgo ogni cliente come se fosse la prima volta. Perché ogni pelle è diversa, ogni persona porta con sé una storia."</p>
+        <!-- TESTO: modifica qui il testo descrittivo -->
+        <p class="about-body">Il mio lavoro è ascoltare prima ancora di toccare. In ogni trattamento metto la stessa attenzione, la stessa cura, lo stesso desiderio di farti sentire bene — non solo esternamente, ma nel profondo.</p>
+        <p class="about-body">Sinergie nasce nel 2015 a Rovereto, in Via Pasubio 45/B. Dieci anni di trattamenti personalizzati, di clienti che tornano non solo per i risultati, ma per come si sentono accolte.</p>
+      </div>
+
+      <div class="about-visual reveal">
+        <!-- FOTO: foto di Barbara — dimensioni consigliate 600x800px -->
+        <div class="about-frame">
+          <div class="about-frame-text">
+            <!-- TESTO: modifica qui la citazione nel frame -->
+            <blockquote>"Barbara è unica nel suo lavoro. Ti mette a tuo agio, ed esci rinata."</blockquote>
+            <cite>— Clienti Sinergie, Rovereto</cite>
+          </div>
+        </div>
+        <!-- Badge 10 anni — in basso a destra (opposto all'originale) -->
+        <div class="about-badge-float">
+          <!-- TESTO: modifica qui gli anni -->
+          <span class="big-num">10</span>
+          <span class="small-txt">anni<br>insieme</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Z riga 2: pull-quote centrata con virgolette grandi -->
+    <div class="about-centered-quote reveal">
+      <!-- TESTO: modifica qui la citazione centrata -->
+      <blockquote>"Il mio lavoro è ascoltare prima ancora di toccare."</blockquote>
+      <cite>— Barbara Tosin</cite>
+    </div>
+
+    <!-- Z riga 3: feature tags centrate -->
+    <div class="about-features-center reveal">
+      <div class="feature-tag"><span class="icon">✦</span>Trattamenti viso</div>
+      <div class="feature-tag"><span class="icon">✦</span>Massaggi benessere</div>
+      <div class="feature-tag"><span class="icon">✦</span>Trattamenti corpo</div>
+      <div class="feature-tag"><span class="icon">✦</span>Laminazione ciglia</div>
+      <div class="feature-tag"><span class="icon">✦</span>Cerette professionali</div>
+      <div class="feature-tag"><span class="icon">✦</span>Percorsi personalizzati</div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════
+     SERVIZI — tab orizzontali + griglia asimmetrica
+═══════════════════════════════ -->
+<section class="services-preview" id="servizi">
+  <div class="container">
+
+    <div class="services-preview-head reveal">
+      <span class="section-eyebrow">I trattamenti</span>
+      <!-- TESTO: modifica qui il titolo sezione servizi -->
+      <h2 class="section-title">Ogni trattamento, <em>su misura.</em></h2>
+      <p class="section-body">Ogni seduta è pensata per te — per la tua pelle, il tuo momento, il tuo benessere.</p>
+    </div>
+
+    <!-- Tab bar orizzontale editoriale -->
+    <div class="services-tab-bar reveal">
+      <button class="services-tab-btn active" data-cat="viso">Viso</button>
+      <button class="services-tab-btn" data-cat="corpo">Corpo</button>
+      <button class="services-tab-btn" data-cat="massaggi">Massaggi</button>
+      <button class="services-tab-btn" data-cat="ciglia">Ciglia</button>
+      <button class="services-tab-btn" data-cat="pacchetti">Pacchetti</button>
+    </div>
+
+    <!-- Griglia asimmetrica: prima card full-width, poi 2-col -->
+    <div class="services-preview-grid" id="servicesPreviewGrid">
+
+      <!-- ══ VISO ══ -->
+      <!-- Prima card: featured full-width -->
+      <!-- TESTO: modifica qui nome, descrizione e prezzo -->
+      <div class="service-card" data-cat="viso">
+        <div>
+          <span class="service-card-cat">Viso · Trattamento</span>
+          <!-- TESTO: modifica qui il nome del trattamento signature -->
+          <div class="service-card-name">Pulizia Profonda</div>
+          <div class="service-card-desc">Trattamento rigenerante con vapore, estrazione manuale e maschera lenitiva. La base di ogni routine perfetta.</div>
+        </div>
+        <div class="sc-right">
+          <span class="service-special-tag">Signature</span>
+          <!-- TESTO: modifica qui il prezzo -->
+          <div class="service-card-price"><span class="from">da</span>€ 55</div>
+        </div>
+      </div>
+      <div class="service-card" data-cat="viso">
+        <span class="service-card-cat">Viso · Idratazione</span>
+        <div class="service-card-name">Trattamento Idratante</div>
+        <div class="service-card-desc">Siero ad alta concentrazione e massaggio viso rilassante. Pelle luminosa e rimpolpata fin dalla prima seduta.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 50</div>
+      </div>
+      <div class="service-card" data-cat="viso">
+        <span class="service-card-cat">Viso · Anti-età</span>
+        <div class="service-card-name">Trattamento Anti-Età</div>
+        <div class="service-card-desc">Lifting manuale, principi attivi anti-rughe e maschera rassodante. Risultati visibili dopo la prima seduta.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 65</div>
+      </div>
+      <div class="service-card" data-cat="viso">
+        <span class="service-card-cat">Viso · Luminosità</span>
+        <div class="service-card-name">Peeling Enzimatico</div>
+        <div class="service-card-desc">Esfoliazione delicata con enzimi naturali. Rimuove le cellule morte e rivela la luminosità naturale della pelle.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 48</div>
+      </div>
+      <div class="service-card" data-cat="viso">
+        <span class="service-card-cat">Viso · Sensi</span>
+        <div class="service-card-name">Trattamento Relax Viso</div>
+        <div class="service-card-desc">Massaggio cranio-facciale, aromaterapia e maschera al collagene. Per ritrovare il respiro e la luce.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 60</div>
+      </div>
+      <div class="service-card" data-cat="viso">
+        <span class="service-card-cat">Viso · Personalizzato</span>
+        <div class="service-card-name">Consulenza + Trattamento</div>
+        <div class="service-card-desc">Analisi della pelle con Barbara e protocollo personalizzato. Il punto di partenza ideale per ogni nuova cliente.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 70</div>
+      </div>
+
+      <!-- ══ CORPO ══ -->
+      <div class="service-card" data-cat="corpo">
+        <div>
+          <span class="service-card-cat">Corpo · Modellante</span>
+          <div class="service-card-name">Fango Bioattivo</div>
+          <div class="service-card-desc">Trattamento drenante e modellante con fanghi mineralizzanti. Perfetto per riattivare la circolazione e sgonfiare.</div>
+        </div>
+        <div class="sc-right">
+          <span class="service-special-tag">Signature</span>
+          <div class="service-card-price"><span class="from">da</span>€ 65</div>
+        </div>
+      </div>
+      <div class="service-card" data-cat="corpo">
+        <span class="service-card-cat">Corpo · Rassodante</span>
+        <div class="service-card-name">Bendaggio Snellente</div>
+        <div class="service-card-desc">Bendaggi con principi attivi lipolitici e rassodanti. Silhouette più tonica e definita già dalla prima seduta.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 60</div>
+      </div>
+      <div class="service-card" data-cat="corpo">
+        <span class="service-card-cat">Corpo · Esfoliante</span>
+        <div class="service-card-name">Scrub Corpo Aromatico</div>
+        <div class="service-card-desc">Esfoliazione corpo con sali marini e oli essenziali. Pelle morbida come seta, mente in pace.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 45</div>
+      </div>
+      <div class="service-card" data-cat="corpo">
+        <span class="service-card-cat">Corpo · Drenante</span>
+        <div class="service-card-name">Trattamento Anticellulite</div>
+        <div class="service-card-desc">Massaggio specifico + principi attivi drenanti. Programma personalizzato per gambe e cosce.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 55</div>
+      </div>
+      <div class="service-card" data-cat="corpo">
+        <span class="service-card-cat">Corpo · Lusso</span>
+        <div class="service-card-name">Rituale Corpo Completo</div>
+        <div class="service-card-desc">Scrub, maschera nutriente e massaggio rilassante. Un'ora e mezza di puro benessere per corpo e mente.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 90</div>
+      </div>
+      <div class="service-card" data-cat="corpo">
+        <span class="service-card-cat">Corpo · Epilazione</span>
+        <div class="service-card-name">Ceretta Gambe Intere</div>
+        <div class="service-card-desc">Cera tiepida professionale per una depilazione duratura e meno traumatica. Pelle setosa a lungo.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 30</div>
+      </div>
+
+      <!-- ══ MASSAGGI ══ -->
+      <div class="service-card" data-cat="massaggi">
+        <div>
+          <span class="service-card-cat">Massaggio · Relax</span>
+          <div class="service-card-name">Massaggio Relax Corpo</div>
+          <div class="service-card-desc">Mani che sciolgono la tensione, oli caldi, pressioni calibrate. Il massaggio che ogni donna merita almeno una volta al mese.</div>
+        </div>
+        <div class="sc-right">
+          <span class="service-special-tag">Signature</span>
+          <div class="service-card-price"><span class="from">da</span>€ 55</div>
+        </div>
+      </div>
+      <div class="service-card" data-cat="massaggi">
+        <span class="service-card-cat">Massaggio · Decontratturante</span>
+        <div class="service-card-name">Massaggio Decontratturante</div>
+        <div class="service-card-desc">Tecnica specifica su collo, spalle e schiena. Allevia tensioni muscolari profonde e migliora la postura.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 50</div>
+      </div>
+      <div class="service-card" data-cat="massaggi">
+        <span class="service-card-cat">Massaggio · Drenante</span>
+        <div class="service-card-name">Drenaggio Linfatico Manuale</div>
+        <div class="service-card-desc">Tecnica dolce per attivare il sistema linfatico, ridurre gonfiori e migliorare la circolazione.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 60</div>
+      </div>
+      <div class="service-card" data-cat="massaggi">
+        <span class="service-card-cat">Massaggio · Aromaterapia</span>
+        <div class="service-card-name">Massaggio agli Oli Essenziali</div>
+        <div class="service-card-desc">Blend personalizzato di oli puri per equilibrare corpo e mente. Un viaggio sensoriale completo.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 58</div>
+      </div>
+      <div class="service-card" data-cat="massaggi">
+        <span class="service-card-cat">Massaggio · Piedi</span>
+        <div class="service-card-name">Riflessologia Plantare</div>
+        <div class="service-card-desc">Massaggio riflesso dei piedi che agisce su tutto l'organismo. Profondo rilassamento e riequilibrio energetico.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 45</div>
+      </div>
+      <div class="service-card" data-cat="massaggi">
+        <span class="service-card-cat">Massaggio · Completo</span>
+        <div class="service-card-name">Massaggio Corpo + Viso</div>
+        <div class="service-card-desc">Un'ora di massaggio corpo e trenta minuti di massaggio viso rilassante. Il protocollo completo del benessere.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 85</div>
+      </div>
+
+      <!-- ══ CIGLIA ══ -->
+      <div class="service-card" data-cat="ciglia">
+        <div>
+          <span class="service-card-cat">Ciglia · Laminazione</span>
+          <div class="service-card-name">Laminazione Ciglia</div>
+          <div class="service-card-desc">Trattamento che piega e nutre le ciglia naturali rendendole più folte e ricurve. Effetto duratura 6–8 settimane.</div>
+        </div>
+        <div class="sc-right">
+          <span class="service-special-tag">Signature</span>
+          <div class="service-card-price"><span class="from">da</span>€ 50</div>
+        </div>
+      </div>
+      <div class="service-card" data-cat="ciglia">
+        <span class="service-card-cat">Ciglia · Colore</span>
+        <div class="service-card-name">Tinta Ciglia e Sopracciglia</div>
+        <div class="service-card-desc">Colorazione professionale per uno sguardo definito e intenso senza trucco. Dura fino a 4 settimane.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 20</div>
+      </div>
+      <div class="service-card" data-cat="ciglia">
+        <span class="service-card-cat">Ciglia + Sopracciglia</span>
+        <div class="service-card-name">Laminazione + Tinta Completa</div>
+        <div class="service-card-desc">Laminazione ciglia, tinta ciglia e definizione sopracciglia. Il trattamento occhi completo di Barbara.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 65</div>
+      </div>
+      <div class="service-card" data-cat="ciglia">
+        <span class="service-card-cat">Sopracciglia · Design</span>
+        <div class="service-card-name">Definizione Sopracciglia</div>
+        <div class="service-card-desc">Pulizia, design e colore per sopracciglia perfettamente disegnate. Lo sguardo cambia tutto.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 18</div>
+      </div>
+      <div class="service-card" data-cat="ciglia">
+        <span class="service-card-cat">Ciglia · Nutrimento</span>
+        <div class="service-card-name">Trattamento Nutriente Ciglia</div>
+        <div class="service-card-desc">Siero rigenerante per ciglia fragili e rade. Rafforza e nutre il bulbo per una crescita più sana.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 30</div>
+      </div>
+      <div class="service-card" data-cat="ciglia">
+        <span class="service-card-cat">Ciglia · Rimozione</span>
+        <div class="service-card-name">Rimozione e Ricostruzione</div>
+        <div class="service-card-desc">Rimozione sicura di trattamenti precedenti e preparazione per il prossimo. In mani esperte.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 25</div>
+      </div>
+
+      <!-- ══ PACCHETTI ══ -->
+      <div class="service-card" data-cat="pacchetti">
+        <div>
+          <span class="service-card-cat">Pacchetto · Benessere</span>
+          <div class="service-card-name">Percorso Rinascita</div>
+          <div class="service-card-desc">4 trattamenti viso + 2 massaggi relax. Un percorso di 6 sedute per ritrovare la tua luminosità naturale.</div>
+        </div>
+        <div class="sc-right">
+          <span class="service-special-tag">Signature</span>
+          <div class="service-card-price"><span class="from">da</span>€ 290</div>
+        </div>
+      </div>
+      <div class="service-card" data-cat="pacchetti">
+        <span class="service-card-cat">Pacchetto · Sposa</span>
+        <div class="service-card-name">Preparazione Sposa</div>
+        <div class="service-card-desc">Percorso personalizzato pre-matrimonio: viso, corpo, ciglia. Perché il tuo giorno più bello meriti la versione migliore di te.</div>
+        <div class="service-card-price">Su richiesta</div>
+      </div>
+      <div class="service-card" data-cat="pacchetti">
+        <span class="service-card-cat">Pacchetto · Regalo</span>
+        <div class="service-card-name">Gift Card Sinergie</div>
+        <div class="service-card-desc">Il regalo più bello: un'ora solo per sé. Personalizzabile per ogni importo, consegnata a mano con cura.</div>
+        <div class="service-card-price">A scelta</div>
+      </div>
+      <div class="service-card" data-cat="pacchetti">
+        <span class="service-card-cat">Pacchetto · Anticellulite</span>
+        <div class="service-card-name">Percorso Corpo Slim</div>
+        <div class="service-card-desc">6 sedute corpo con alternanza di trattamenti drenanti, modellanti e massaggi specifici. Risultati progressivi.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 320</div>
+      </div>
+      <div class="service-card" data-cat="pacchetti">
+        <span class="service-card-cat">Pacchetto · Viso Intensivo</span>
+        <div class="service-card-name">Ciclo Viso Luminoso</div>
+        <div class="service-card-desc">3 trattamenti viso ravvicinati per massimizzare i risultati. Ideale prima di un evento importante.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 160</div>
+      </div>
+      <div class="service-card" data-cat="pacchetti">
+        <span class="service-card-cat">Pacchetto · Completo</span>
+        <div class="service-card-name">Giornata Sinergie</div>
+        <div class="service-card-desc">Una mezza giornata intera solo per te: trattamento viso, massaggio corpo, laminazione ciglia e relax.</div>
+        <div class="service-card-price"><span class="from">da</span>€ 180</div>
+      </div>
+
+    </div><!-- /grid -->
+
+    <div style="text-align:center;margin-top:2.5rem;">
+      <a href="sinergie-servizi.html" class="btn-rose">Tutti i trattamenti →</a>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════
+     STATS — composizione tipografica poetica
+═══════════════════════════════ -->
+<div class="stats-band">
+  <div class="stats-poem">
+
+    <!-- TESTO: modifica qui numeri ed etichette statistiche -->
+
+    <!-- Verso 1 — a sinistra -->
+    <div class="stats-verse">
+      <span class="stat-num-v">10</span>
+      <span class="stats-verse-sep">,</span>
+      <div class="stat-text-v">
+        <span class="stat-label-v">Anni di attività</span>
+        <span class="stat-desc-v">Dal 2015 con passione.</span>
+      </div>
+    </div>
+
+    <!-- Verso 2 — a destra -->
+    <div class="stats-verse">
+      <div class="stat-text-v" style="text-align:right;">
+        <span class="stat-label-v">Soddisfatte</span>
+        <span class="stat-desc-v">Le clienti consigliano Barbara.</span>
+      </div>
+      <span class="stats-verse-sep">,</span>
+      <span class="stat-num-v">98%</span>
+    </div>
+
+    <!-- Verso 3 — indentato a sinistra -->
+    <div class="stats-verse">
+      <span class="stat-num-v">+500</span>
+      <span class="stats-verse-sep">,</span>
+      <div class="stat-text-v">
+        <span class="stat-label-v">Trattamenti / anno</span>
+        <span class="stat-desc-v">Ogni seduta, con dedizione.</span>
+      </div>
+    </div>
+
+    <!-- Verso 4 — a destra -->
+    <div class="stats-verse">
+      <div class="stat-text-v" style="text-align:right;">
+        <span class="stat-label-v">Barbara</span>
+        <span class="stat-desc-v">Unica, insostituibile.</span>
+      </div>
+      <span class="stats-verse-sep">,</span>
+      <span class="stat-num-v">1</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════
+     CAROUSEL — altezze alternate
+═══════════════════════════════ -->
+<section class="reviews-section" id="recensioni">
+  <div class="container">
+    <div class="reviews-head reveal">
+      <div>
+        <span class="section-eyebrow">Cosa dicono di Barbara</span>
+        <!-- TESTO: modifica qui il titolo sezione recensioni -->
+        <h2 class="section-title">Parole dalle <em>nostre clienti</em></h2>
+      </div>
+      <a href="sinergie-recensioni.html" class="btn-outline">Tutte le recensioni →</a>
+    </div>
+  </div>
+  <div class="rev-wrap">
+    <div class="rev-track">
+      <!-- TESTO: modifica qui ogni recensione -->
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Barbara è unica, svolge il suo lavoro come una missione, ti mette a tuo agio, ed esci rinata."</p><span class="rev-author">Cliente Sinergie</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Mani di fata. Bellissimo e rilassante. Non vedo l'ora di tornare!"</p><span class="rev-author">Cliente Sinergie</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Semplicemente bravissima. Barbara è una professionista nel suo lavoro. Gentile, solare, trasmette grande tranquillità."</p><span class="rev-author">Cliente Sinergie</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Che meraviglia! Esco sempre rilassata e con la pelle luminosissima. Barbara sa esattamente di cosa ho bisogno."</p><span class="rev-author">Cliente affezionata</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Ho fatto la laminazione ciglia e sono rimasta senza parole. Risultato naturale e duraturo — ci tornerò sicuramente."</p><span class="rev-author">Nuova cliente · Rovereto</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Un posto dove mi sento accolta ogni volta. Barbara è più di un'estetista: è una persona speciale che sa ascoltare."</p><span class="rev-author">Cliente da 5 anni</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Il massaggio decontratturante è stato incredibile. Sono uscita senza più un grammo di tensione. Tornerò presto!"</p><span class="rev-author">Cliente soddisfatta</span></div>
+      <!-- Duplicato per loop continuo -->
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Barbara è unica, svolge il suo lavoro come una missione, ti mette a tuo agio, ed esci rinata."</p><span class="rev-author">Cliente Sinergie</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Mani di fata. Bellissimo e rilassante. Non vedo l'ora di tornare!"</p><span class="rev-author">Cliente Sinergie</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Semplicemente bravissima. Barbara è una professionista nel suo lavoro. Gentile, solare, trasmette grande tranquillità."</p><span class="rev-author">Cliente Sinergie</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Che meraviglia! Esco sempre rilassata e con la pelle luminosissima. Barbara sa esattamente di cosa ho bisogno."</p><span class="rev-author">Cliente affezionata</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Ho fatto la laminazione ciglia e sono rimasta senza parole. Risultato naturale e duraturo — ci tornerò sicuramente."</p><span class="rev-author">Nuova cliente · Rovereto</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Un posto dove mi sento accolta ogni volta. Barbara è più di un'estetista: è una persona speciale che sa ascoltare."</p><span class="rev-author">Cliente da 5 anni</span></div>
+      <div class="rev-card"><div class="rev-stars">★★★★★</div><p class="rev-text">"Il massaggio decontratturante è stato incredibile. Sono uscita senza più un grammo di tensione. Tornerò presto!"</p><span class="rev-author">Cliente soddisfatta</span></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <!-- TESTO: modifica qui il nome nel logo footer -->
+      <div class="footer-logo">Sinergie <em>·</em></div>
+      <!-- TESTO: modifica qui il tagline footer -->
+      <div class="footer-tagline">Estetica Di Tosin Barbara<br>Via Pasubio 45/B · Rovereto (TN)</div>
+    </div>
+    <div>
+      <span class="footer-col-title">Pagine</span>
+      <ul class="footer-links">
+        <li><a href="index.html">Homepage</a></li>
+        <li><a href="sinergie-servizi.html">I trattamenti</a></li>
+        <li><a href="sinergie-recensioni.html">Recensioni</a></li>
+        <li><a href="sinergie-dove-siamo.html">Dove siamo</a></li>
+      </ul>
+    </div>
+    <div>
+      <span class="footer-col-title">Contatti</span>
+      <!-- TESTO: modifica qui indirizzo e contatti -->
+      <div class="footer-address">
+        Via Pasubio 45/B<br>38068 Rovereto (TN)<br><br>
+        Tel: <a href="tel:+390464712994" style="color:var(--muted);text-decoration:none;">0464 712994</a><br>
+        Cel: <a href="tel:+393465723942" style="color:var(--muted);text-decoration:none;">346 572 3942</a><br><br>
+        <a href="mailto:esteticasinergierovereto@gmail.com" style="color:var(--muted);text-decoration:none;font-size:.82rem;">esteticasinergierovereto@gmail.com</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <!-- TESTO: modifica qui il copyright -->
+    <div class="footer-copy">© 2025 Estetica Sinergie Di Tosin Barbara · Rovereto (TN)</div>
+    <div class="footer-copy">10 anni · 98% clienti soddisfatte</div>
+    <!-- Link nascosto alla pagina storia — non rimuovere -->
+    <a href="sinergie-storia.html" class="footer-secret" title="">✦</a>
+  </div>
+</footer>
+
+
+<script>
+  /* Nav scroll */
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+
+  /* Hamburger */
+  document.getElementById('navHamburger').addEventListener('click', function() {
+    const open = nav.classList.toggle('nav-open');
+    this.setAttribute('aria-expanded', open);
+  });
+  document.addEventListener('click', e => { if (!nav.contains(e.target)) nav.classList.remove('nav-open'); });
+
+  /* Reveal on scroll */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const siblings = [...e.target.parentElement.querySelectorAll('.reveal')];
+        e.target.style.transitionDelay = `${siblings.indexOf(e.target) * 0.12}s`;
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold:0.08 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  /* Tab servizi con fade */
+  const serviceItems = document.querySelectorAll('#servicesPreviewGrid .service-card');
+  const grid = document.getElementById('servicesPreviewGrid');
+
+  function filterServices(cat) {
+    grid.classList.add('fading');
+    setTimeout(() => {
+      serviceItems.forEach(i => { i.style.display = i.dataset.cat === cat ? '' : 'none'; });
+      grid.classList.remove('fading');
+    }, 280);
+  }
+  filterServices('viso');
+
+  document.querySelectorAll('.services-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.services-tab-btn')
+        .forEach(b => b.classList.toggle('active', b.dataset.cat === btn.dataset.cat));
+      filterServices(btn.dataset.cat);
+    });
+  });
+</script>
+</body>
+</html>

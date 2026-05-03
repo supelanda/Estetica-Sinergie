@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- TESTO: modifica qui il titolo del tab del browser -->
+<title>Dove Siamo — Sinergie Estetica · Rovereto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sinergie-base.css">
+<link rel="stylesheet" href="sinergie-responsive.css">
+<style>
+
+.page-hero { padding:10rem 3rem 4rem; }
+.page-hero-inner { max-width:560px; }
+
+/* ── Split mappa + info ── */
+.dove-split {
+  position:relative; z-index:1;
+  display:grid; grid-template-columns:1fr 1fr;
+  min-height:75vh; border-bottom:1px solid var(--border);
+}
+
+/* Mappa */
+.dove-map {
+  position:relative; overflow:hidden;
+  background:var(--panel); border-right:1px solid var(--border);
+}
+.dove-map::before {
+  content:''; position:absolute; inset:0; z-index:1; pointer-events:none;
+  background-image:radial-gradient(circle, rgba(196,131,122,.1) 1px, transparent 1px);
+  background-size:28px 28px; background-position:14px 14px;
+}
+/* PERSONALIZZA: sostituisci il src dell'iframe con le coordinate di Via Pasubio 45/B, Rovereto */
+.dove-map iframe {
+  position:absolute; inset:0; width:100%; height:100%; border:0; display:block;
+  filter:saturate(.5) contrast(1.1) brightness(.75) hue-rotate(280deg);
+}
+.map-open-btn {
+  position:absolute; bottom:3rem; left:50%; transform:translateX(-50%);
+  font-family:'Jost',sans-serif; font-size:.7rem; font-weight:600;
+  letter-spacing:.2em; text-transform:uppercase;
+  color:var(--rose-lt); text-decoration:none;
+  background:rgba(26,16,20,.9); border:1px solid var(--border);
+  padding:.65rem 1.6rem; backdrop-filter:blur(8px);
+  white-space:nowrap; transition:border-color .25s; z-index:2;
+}
+.map-open-btn:hover { border-color:var(--rose); }
+
+/* Pannello info */
+.dove-info {
+  padding:4.5rem 4rem; display:flex; flex-direction:column; gap:2.8rem;
+}
+.info-block-label {
+  font-family:'Jost',sans-serif; font-size:.65rem; font-weight:700;
+  letter-spacing:.32em; text-transform:uppercase;
+  color:var(--rose); margin-bottom:.9rem;
+  display:flex; align-items:center; gap:.8rem;
+}
+.info-block-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* TESTO: modifica qui l'indirizzo */
+.info-address {
+  font-family:'Cormorant Garamond',serif; font-size:1.5rem; line-height:1.35; color:var(--cream);
+}
+.info-address-sub { font-size:.88rem; color:var(--muted); margin-top:.5rem; font-style:italic; font-weight:300; }
+
+/* Orari */
+.hours-table { width:100%; }
+.hours-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:.5rem 0; border-bottom:1px solid rgba(196,131,122,.07); font-size:.92rem;
+}
+.hours-row:last-child { border-bottom:none; }
+.hours-row .day { color:var(--muted); font-weight:400; }
+.hours-row .time { color:var(--cream); font-weight:300; }
+.hours-row.today .day,
+.hours-row.today .time { color:var(--gold); }
+.hours-row.closed .day,
+.hours-row.closed .time { color:var(--muted); opacity:.38; }
+.today-badge {
+  font-family:'Jost',sans-serif; font-size:.56rem; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase;
+  background:rgba(201,169,110,.1); color:var(--gold);
+  padding:.18rem .5rem; border:1px solid rgba(201,169,110,.25); margin-left:.5rem;
+}
+
+/* Contatti rapidi */
+.contact-chips { display:flex; flex-direction:column; gap:.7rem; }
+.contact-chip {
+  display:flex; align-items:center; gap:1rem; padding:.8rem 1rem;
+  border:1px solid var(--border); text-decoration:none;
+  transition:border-color .25s, background .25s;
+}
+.contact-chip:hover { border-color:var(--rose); background:var(--rose-dim); }
+.contact-chip-icon { font-size:1rem; color:var(--rose); flex-shrink:0; }
+.contact-chip-text { font-size:.9rem; color:var(--cream); font-weight:300; }
+.contact-chip-label { font-family:'Jost',sans-serif; font-size:.58rem; font-weight:600; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); display:block; }
+
+/* ── Form contatti ── */
+.contact-section {
+  position:relative; z-index:1;
+  padding:7rem 0; border-bottom:1px solid var(--border);
+}
+.contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:6rem; align-items:start; }
+.contact-intro { }
+.contact-intro h2 {
+  font-family:'Cormorant Garamond',serif; font-size:clamp(2rem,3.5vw,3rem);
+  font-weight:400; color:var(--cream); margin-bottom:1rem;
+}
+.contact-intro h2 em { font-style:italic; color:var(--gold); }
+.contact-intro p { font-size:.95rem; color:var(--muted); line-height:1.85; font-weight:300; }
+
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.contact-form {}
+
+/* ── Quartiere / Info utili ── */
+.neighbourhood { position:relative; z-index:1; padding:6rem 0; border-bottom:1px solid var(--border); }
+.neighbourhood-header { margin-bottom:3rem; }
+.neighbourhood-header h2 {
+  font-family:'Cormorant Garamond',serif; font-size:clamp(1.8rem,3vw,2.4rem);
+  font-weight:400; color:var(--cream); margin-bottom:.6rem;
+}
+.neighbourhood-header h2 em { font-style:italic; color:var(--gold); }
+.neighbourhood-header p { font-size:.9rem; color:var(--muted); max-width:460px; font-weight:300; }
+
+.poi-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+  background:var(--border); border:1px solid var(--border);
+}
+.poi-item {
+  background:var(--panel); padding:2rem 1.6rem;
+  transition:background .25s;
+}
+.poi-item:hover { background:var(--panel-lt); }
+.poi-emoji { font-size:1.6rem; margin-bottom:.6rem; display:block; }
+.poi-name {
+  font-family:'Cormorant Garamond',serif; font-size:1rem;
+  font-weight:400; color:var(--cream); margin-bottom:.3rem;
+}
+.poi-desc { font-size:.82rem; color:var(--muted); line-height:1.5; font-weight:300; }
+.poi-dist {
+  margin-top:.6rem; font-family:'Jost',sans-serif; font-size:.62rem;
+  font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--rose); opacity:.7;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── NAVIGAZIONE ── -->
+<nav id="nav">
+  <div class="nav-links">
+    <a href="sinergie-servizi.html">Servizi</a>
+    <a href="index.html#about">Chi siamo</a>
+  </div>
+  <a href="index.html" class="nav-logo">Sinergie <em>·</em></a>
+  <div class="nav-links nav-links-right">
+    <a href="sinergie-recensioni.html">Recensioni</a>
+    <a href="sinergie-dove-siamo.html" class="active">Dove siamo</a>
+    <a href="sinergie-dove-siamo.html" class="nav-cta">Prenota ora →</a>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Apri menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <a href="sinergie-servizi.html">Servizi</a>
+    <a href="index.html#about">Chi siamo</a>
+    <a href="sinergie-recensioni.html">Recensioni</a>
+    <a href="sinergie-dove-siamo.html" class="active">Dove siamo</a>
+    <a href="sinergie-dove-siamo.html" class="nav-mobile-cta">Prenota ora →</a>
+  </div>
+</nav>
+
+
+<!-- ── HERO ── -->
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <!-- TESTO: modifica qui l'eyebrow -->
+    <span class="eyebrow">Dove siamo</span>
+    <!-- TESTO: modifica qui il titolo della pagina -->
+    <h1 class="page-title">Vieni a<em>trovarci.</em></h1>
+    <!-- TESTO: modifica qui il testo descrittivo -->
+    <p class="page-sub">Via Pasubio 45/B, Rovereto. A pochi passi dal centro, in un posto dove il tempo rallenta e ci si prende cura di sé.</p>
+  </div>
+</div>
+
+
+<!-- ── MAPPA + INFO ── -->
+<div class="dove-split">
+  <div class="dove-map">
+    <!-- PERSONALIZZA: sostituisci src con l'iframe di Google Maps per Via Pasubio 45/B, Rovereto -->
+    <!-- Esempio: <iframe src="https://www.google.com/maps/embed?pb=..."></iframe> -->
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2775.012!2d11.0370!3d45.8908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x477809f7e3c60001%3A0x1!2sVia+Pasubio+45%2FB%2C+Rovereto+TN!5e0!3m2!1sit!2sit!4v1700000000000"
+      allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+    <!-- TESTO: modifica qui il testo del link per aprire Maps -->
+    <a href="https://maps.google.com/?q=Via+Pasubio+45/B+Rovereto+TN" class="map-open-btn" target="_blank" rel="noopener">
+      Apri in Google Maps →
+    </a>
+  </div>
+  <div class="dove-info">
+    <!-- Indirizzo -->
+    <div class="info-block">
+      <div class="info-block-label">Indirizzo</div>
+      <!-- TESTO: modifica qui l'indirizzo -->
+      <div class="info-address">Via Pasubio 45/B<br>38068 Rovereto (TN)</div>
+      <div class="info-address-sub">Trentino-Alto Adige · Italia</div>
+    </div>
+
+    <!-- Orari -->
+    <div class="info-block">
+      <div class="info-block-label">Orari di apertura</div>
+      <!-- TESTO: modifica qui gli orari di apertura -->
+      <div class="hours-table">
+        <div class="hours-row" id="h-lun"><span class="day">Lunedì</span><span class="time">09:00 – 19:00</span></div>
+        <div class="hours-row" id="h-mar"><span class="day">Martedì</span><span class="time">09:00 – 19:00</span></div>
+        <div class="hours-row" id="h-mer"><span class="day">Mercoledì</span><span class="time">09:00 – 19:00</span></div>
+        <div class="hours-row" id="h-gio"><span class="day">Giovedì</span><span class="time">09:00 – 19:00</span></div>
+        <div class="hours-row" id="h-ven"><span class="day">Venerdì</span><span class="time">09:00 – 19:00</span></div>
+        <div class="hours-row" id="h-sab"><span class="day">Sabato</span><span class="time">09:00 – 13:00</span></div>
+        <div class="hours-row closed" id="h-dom"><span class="day">Domenica</span><span class="time">Chiuso</span></div>
+      </div>
+    </div>
+
+    <!-- Contatti diretti -->
+    <div class="info-block">
+      <div class="info-block-label">Contatti</div>
+      <div class="contact-chips">
+        <!-- TESTO: modifica qui i numeri di telefono -->
+        <a href="tel:+390464712994" class="contact-chip">
+          <span class="contact-chip-icon">☎</span>
+          <div>
+            <span class="contact-chip-label">Telefono</span>
+            <span class="contact-chip-text">0464 712994</span>
+          </div>
+        </a>
+        <a href="tel:+393465723942" class="contact-chip">
+          <span class="contact-chip-icon">📱</span>
+          <div>
+            <span class="contact-chip-label">Cellulare</span>
+            <span class="contact-chip-text">346 572 3942</span>
+          </div>
+        </a>
+        <!-- TESTO: modifica qui l'indirizzo email -->
+        <a href="mailto:esteticasinergierovereto@gmail.com" class="contact-chip">
+          <span class="contact-chip-icon">✉</span>
+          <div>
+            <span class="contact-chip-label">Email</span>
+            <span class="contact-chip-text">esteticasinergierovereto@gmail.com</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ── FORM CONTATTI ── -->
+<section class="contact-section">
+  <div class="container">
+    <div class="contact-grid">
+      <div class="contact-intro reveal">
+        <span class="section-eyebrow">Scrivici</span>
+        <!-- TESTO: modifica qui il titolo del form -->
+        <h2>Hai una <em>domanda?</em></h2>
+        <!-- TESTO: modifica qui il testo introduttivo del form -->
+        <p style="margin-top:.8rem;">Prenota un appuntamento, chiedi informazioni su un trattamento o semplicemente dicci cosa ti serve. Barbara risponde di persona.</p>
+        <p style="margin-top:1.2rem;font-size:.85rem;color:var(--muted);font-weight:300;">Il form aprirà il tuo client email con tutti i campi già compilati.</p>
+      </div>
+      <div class="contact-form reveal">
+        <!-- PERSONALIZZA: il form usa mailto: — modifica i campi select con i tuoi servizi reali -->
+        <form id="contactForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nome">Nome</label>
+              <input type="text" id="nome" name="nome" placeholder="Il tuo nome" required>
+            </div>
+            <div class="form-group">
+              <label for="telefono">Telefono</label>
+              <input type="tel" id="telefono" name="telefono" placeholder="Il tuo numero">
+            </div>
+          </div>
+          <!-- TESTO: modifica qui le opzioni di servizio nella select -->
+          <div class="form-group">
+            <label for="servizio">Servizio di interesse</label>
+            <select id="servizio" name="servizio">
+              <option value="">Scegli un trattamento…</option>
+              <option>Trattamento Viso</option>
+              <option>Pulizia Profonda</option>
+              <option>Massaggio Relax</option>
+              <option>Massaggio Decontratturante</option>
+              <option>Drenaggio Linfatico</option>
+              <option>Trattamento Corpo</option>
+              <option>Laminazione Ciglia</option>
+              <option>Ceretta</option>
+              <option>Pacchetto / Percorso</option>
+              <option>Gift Card</option>
+              <option>Altro / Informazioni</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="messaggio">Messaggio</label>
+            <textarea id="messaggio" name="messaggio" placeholder="Dicci pure tutto — orari preferiti, domande, curiosità…" rows="4"></textarea>
+          </div>
+          <button type="submit" class="form-submit">Invia richiesta →</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── PUNTI DI INTERESSE ── -->
+<section class="neighbourhood">
+  <div class="container">
+    <div class="neighbourhood-header reveal">
+      <!-- TESTO: modifica qui il titolo della sezione quartiere -->
+      <h2>Siamo nel <em>cuore di Rovereto</em></h2>
+      <p>Via Pasubio si trova a pochi passi dal centro storico, raggiungibile facilmente a piedi, in auto o con i mezzi.</p>
+    </div>
+    <!-- TESTO: modifica qui i punti di interesse -->
+    <div class="poi-grid reveal">
+      <div class="poi-item">
+        <span class="poi-emoji">🅿</span>
+        <div class="poi-name">Parcheggio</div>
+        <div class="poi-desc">Zona con parcheggi liberi e a pagamento nelle vicinanze.</div>
+        <div class="poi-dist">2 min a piedi</div>
+      </div>
+      <div class="poi-item">
+        <span class="poi-emoji">🚌</span>
+        <div class="poi-name">Bus Urbano</div>
+        <div class="poi-desc">Fermata dell'autobus urbano nelle immediate vicinanze.</div>
+        <div class="poi-dist">1 min a piedi</div>
+      </div>
+      <div class="poi-item">
+        <span class="poi-emoji">🛍</span>
+        <div class="poi-name">Centro Storico</div>
+        <div class="poi-desc">A due passi dal centro, negozi e caffè nelle vicinanze.</div>
+        <div class="poi-dist">5 min a piedi</div>
+      </div>
+      <div class="poi-item">
+        <span class="poi-emoji">🌳</span>
+        <div class="poi-name">Area Verde</div>
+        <div class="poi-desc">Parchi e spazi all'aperto per una passeggiata dopo il trattamento.</div>
+        <div class="poi-dist">3 min a piedi</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Sinergie <em>·</em></div>
+      <div class="footer-tagline">Estetica Di Tosin Barbara<br>Via Pasubio 45/B · Rovereto (TN)</div>
+    </div>
+    <div>
+      <span class="footer-col-title">Pagine</span>
+      <ul class="footer-links">
+        <li><a href="index.html">Homepage</a></li>
+        <li><a href="sinergie-servizi.html">I trattamenti</a></li>
+        <li><a href="sinergie-recensioni.html">Recensioni</a></li>
+        <li><a href="sinergie-dove-siamo.html">Dove siamo</a></li>
+      </ul>
+    </div>
+    <div>
+      <span class="footer-col-title">Contatti</span>
+      <div class="footer-address">
+        Via Pasubio 45/B<br>38068 Rovereto (TN)<br><br>
+        Tel: <a href="tel:+390464712994" style="color:var(--muted);text-decoration:none;">0464 712994</a><br>
+        Cel: <a href="tel:+393465723942" style="color:var(--muted);text-decoration:none;">346 572 3942</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Estetica Sinergie Di Tosin Barbara · Rovereto (TN)</div>
+    <div class="footer-copy">10 anni · 98% clienti soddisfatte</div>
+    <a href="sinergie-storia.html" class="footer-secret" title="">✦</a>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+  document.getElementById('navHamburger').addEventListener('click', function() {
+    const open = nav.classList.toggle('nav-open');
+    this.setAttribute('aria-expanded', open);
+  });
+  document.addEventListener('click', e => { if (!nav.contains(e.target)) nav.classList.remove('nav-open'); });
+
+  /* Reveal on scroll */
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+  }, { threshold:0.08 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  /* Oggi evidenziato */
+  const days = ['h-dom','h-lun','h-mar','h-mer','h-gio','h-ven','h-sab'];
+  const todayId = days[new Date().getDay()];
+  const todayRow = document.getElementById(todayId);
+  if (todayRow && !todayRow.classList.contains('closed')) {
+    todayRow.classList.add('today');
+    const dayEl = todayRow.querySelector('.day');
+    dayEl.innerHTML += ' <span class="today-badge">Oggi</span>';
+  }
+
+  /* Form mailto */
+  document.getElementById('contactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const nome     = document.getElementById('nome').value;
+    const telefono = document.getElementById('telefono').value;
+    const servizio = document.getElementById('servizio').value;
+    const msg      = document.getElementById('messaggio').value;
+
+    /* PERSONALIZZA: modifica l'indirizzo email destinatario qui sotto */
+    const email = 'esteticasinergierovereto@gmail.com';
+    const subject = encodeURIComponent(`Richiesta appuntamento — ${nome}`);
+    const body = encodeURIComponent(
+      `Ciao Barbara,\n\nNome: ${nome}\nTelefono: ${telefono}\nServizio: ${servizio}\n\nMessaggio:\n${msg}\n\nGrazie!`
+    );
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+  });
+</script>
+</body>
+</html>

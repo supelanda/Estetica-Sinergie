@@ -1,0 +1,159 @@
+/*
+ * sinergie-responsive.css
+ * Mobile/tablet — desktop layout mai modificato.
+ * 900px tablet | 600px mobile
+ */
+
+/* ══════════════════════════════════════
+   TABLET ≤ 900px
+══════════════════════════════════════ */
+@media (max-width: 900px) {
+
+  /* ── Nav: hamburger ── */
+  nav {
+    padding: .9rem 1.5rem !important;
+  }
+  .nav-links { display:none !important; }
+  .nav-logo {
+    position:static; transform:none;
+    flex:1; text-align:left;
+  }
+  .nav-hamburger { display:flex; }
+  .nav-cta { display:none; }
+
+  /* Mobile nav dropdown */
+  .nav-mobile-menu {
+    display:none;
+    position:absolute; top:100%; left:0; right:0;
+    background:rgba(26,16,20,.98); backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);
+    padding:.5rem 0 1.4rem; flex-direction:column;
+  }
+  nav.nav-open .nav-mobile-menu { display:flex !important; }
+
+  .nav-mobile-menu a {
+    display:block; padding:.9rem 1.8rem;
+    font-family:'Jost',sans-serif; font-size:.88rem; font-weight:500;
+    letter-spacing:.16em; text-transform:uppercase;
+    color:var(--muted); text-decoration:none;
+    border-bottom:1px solid rgba(196,131,122,.06);
+    transition:color .2s, background .2s;
+  }
+  .nav-mobile-menu a:hover,
+  .nav-mobile-menu a.active {
+    color:var(--rose-lt); background:rgba(196,131,122,.05);
+  }
+  .nav-mobile-cta {
+    margin: .9rem 1.8rem 0;
+    display:inline-block; align-self:flex-start;
+    font-family:'Jost',sans-serif; font-size:.75rem; font-weight:600;
+    letter-spacing:.2em; text-transform:uppercase;
+    background:var(--rose); color:var(--cream);
+    border:none !important; padding:.6rem 1.6rem; text-decoration:none;
+  }
+
+  /* ── Container ── */
+  .container { padding: 0 1.5rem; }
+
+  /* ── Page hero ── */
+  .page-hero { padding: 9rem 1.5rem 3.5rem !important; }
+
+  /* ── Hero (homepage) ── */
+  .hero { grid-template-columns:1fr !important; }
+  .hero-right { display:none; }
+  .hero-left { padding: 7rem 2rem 5rem !important; }
+  .hero-title { font-size: clamp(3rem,11vw,5rem) !important; }
+  .hero-actions { flex-direction:column; align-items:flex-start; gap:.9rem; }
+
+  /* ── About ── */
+  .about { padding: 6rem 0; }
+  .about-grid { grid-template-columns:1fr !important; gap:3rem !important; }
+  .about-visual { max-width:500px; }
+
+  /* ── Services preview ── */
+  .services-preview { padding:6rem 0; }
+  .services-tabs-side { display:none; }
+  .services-tabs-top { display:flex !important; }
+  .services-preview-grid { grid-template-columns:1fr 1fr !important; }
+  .services-layout { grid-template-columns:1fr !important; }
+
+  /* ── Stats band ── */
+  .stats-band-grid { grid-template-columns:1fr 1fr !important; }
+
+  /* ── Reviews ── */
+  .reviews-section { padding:6rem 0; }
+
+  /* ── Footer ── */
+  .footer-inner { grid-template-columns:1fr 1fr !important; gap:2rem !important; }
+  .footer-bottom { flex-direction:column; align-items:flex-start; }
+
+  /* ── Dove siamo ── */
+  .dove-split { grid-template-columns:1fr !important; }
+  .dove-map { border-right:none !important; border-bottom:1px solid var(--border); min-height:380px; }
+  .dove-map iframe { min-height:340px; }
+  .dove-info { padding:3rem 1.5rem !important; }
+
+  /* ── Servizi page ── */
+  .servizi-layout { grid-template-columns:1fr !important; }
+  .servizi-sidebar { display:none; }
+  .servizi-cat-bar { display:flex !important; }
+
+  /* ── Recensioni ── */
+  .recens-grid { columns:2 !important; }
+  .recens-hero-grid { grid-template-columns:1fr !important; }
+}
+
+/* ══════════════════════════════════════
+   MOBILE ≤ 600px
+══════════════════════════════════════ */
+@media (max-width: 600px) {
+
+  body { font-size:16px; }
+  .container { padding:0 1.2rem; }
+
+  /* ── Nav ── */
+  nav { padding:.85rem 1.2rem !important; }
+
+  /* ── Hero ── */
+  .hero-left { padding:7.5rem 1.4rem 4.5rem !important; }
+  .hero-title { font-size:clamp(2.8rem,13vw,4.2rem) !important; }
+  .hero-actions .btn-primary,
+  .hero-actions .btn-outline { width:100%; text-align:center; }
+
+  /* ── Section titles ── */
+  .section-title { font-size:clamp(1.9rem,7.5vw,2.6rem); }
+  .page-title    { font-size:clamp(2.2rem,10vw,3.2rem) !important; }
+  .page-hero { padding:8rem 1.2rem 2.5rem !important; }
+
+  /* ── About ── */
+  .about { padding:4.5rem 0; }
+  .about-frame { aspect-ratio:3/2; }
+
+  /* ── Services ── */
+  .services-preview-grid { grid-template-columns:1fr !important; }
+  .services-tabs-top { flex-wrap:wrap; }
+
+  /* ── Stats band ── */
+  .stats-band-grid { grid-template-columns:1fr 1fr !important; }
+  .stat-item { padding:1.8rem 1.2rem; }
+
+  /* ── Servizi page ── */
+  .servizi-cards-grid { grid-template-columns:1fr !important; }
+  .servizi-cat-bar { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+  .servizi-cat-btn { font-size:.7rem !important; padding:.85rem .9rem !important; white-space:nowrap; }
+
+  /* ── Recensioni ── */
+  .recens-grid { columns:1 !important; }
+
+  /* ── Footer ── */
+  .footer-inner { grid-template-columns:1fr !important; }
+
+  /* ── Buttons ── */
+  .btn-primary, .btn-outline, .btn-rose { padding:.9rem 2rem; font-size:.78rem; }
+
+  /* ── Form ── */
+  .form-row { grid-template-columns:1fr !important; }
+
+  /* ── Dove siamo ── */
+  .dove-map, .dove-map iframe { min-height:260px !important; }
+}

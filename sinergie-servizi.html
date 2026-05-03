@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- TESTO: modifica qui il titolo del tab del browser -->
+<title>Trattamenti — Sinergie Estetica · Rovereto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sinergie-base.css">
+<link rel="stylesheet" href="sinergie-responsive.css">
+<style>
+
+.page-hero { padding:10rem 3rem 4rem; position:relative; overflow:hidden; }
+.page-hero-inner { max-width:580px; }
+
+/* Petalo decorativo background */
+.hero-petal {
+  position:absolute; right:4rem; top:50%; transform:translateY(-50%);
+  width:220px; height:320px; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+  border:1px solid rgba(196,131,122,.12);
+  opacity:0; animation:fadeIn 1.2s .7s forwards;
+}
+.hero-petal::before {
+  content:''; position:absolute; inset:20px;
+  border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+  border:1px solid rgba(201,169,110,.08);
+}
+
+/* Layout servizi */
+.servizi-page { position:relative; z-index:1; border-top:1px solid var(--border); }
+.servizi-layout { display:grid; grid-template-columns:220px 1fr; min-height:80vh; }
+
+/* Sidebar sticky */
+.servizi-sidebar {
+  border-right:1px solid var(--border);
+  padding:3rem 0; position:sticky; top:74px;
+  align-self:start; height:fit-content;
+}
+.servizi-sidebar-title {
+  font-family:'Jost',sans-serif; font-size:.62rem; font-weight:700;
+  letter-spacing:.32em; text-transform:uppercase;
+  color:var(--rose); padding:0 1.5rem; margin-bottom:1rem; display:block;
+}
+.servizi-cat-link {
+  display:flex; align-items:center; gap:.7rem;
+  padding:.8rem 1.5rem;
+  font-family:'Jost',sans-serif; font-size:.73rem; font-weight:500;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); text-decoration:none;
+  border-left:2px solid transparent;
+  transition:color .2s, border-color .2s, background .2s;
+}
+.servizi-cat-link:hover { color:var(--rose-lt); background:var(--rose-dim); }
+.servizi-cat-link.active { color:var(--rose-lt); border-left-color:var(--rose); background:var(--rose-dim); }
+
+/* Cat bar mobile */
+.servizi-cat-bar {
+  display:none; border-bottom:1px solid var(--border);
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
+}
+.servizi-cat-btn {
+  font-family:'Jost',sans-serif; font-size:.7rem; font-weight:600;
+  letter-spacing:.15em; text-transform:uppercase;
+  background:transparent; color:var(--muted); border:none;
+  border-right:1px solid var(--border); padding:.9rem 1.3rem;
+  cursor:pointer; white-space:nowrap;
+  transition:background .2s, color .2s;
+}
+.servizi-cat-btn.active { background:var(--rose); color:var(--cream); }
+
+/* Area card */
+.servizi-cards-area { padding:3.5rem 3rem 6rem; }
+.servizi-cards-grid {
+  display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+  background:var(--border); border:1px solid var(--border);
+  transition:opacity .3s ease;
+}
+.servizi-cards-grid.fading { opacity:0; }
+
+/* Cat header */
+.cat-section-header { margin-bottom:2.5rem; }
+.cat-section-header h2 {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(1.9rem,3.2vw,2.6rem);
+  font-weight:400; color:var(--cream); margin-bottom:.3rem;
+}
+.cat-section-header h2 em { font-style:italic; color:var(--gold); }
+.cat-section-header p { font-size:.9rem; color:var(--muted); font-weight:300; }
+
+/* Singola card servizio */
+/* TESTO: modifica qui nome, descrizione e prezzo di ogni trattamento */
+.service-card {
+  background:var(--panel); padding:2.2rem 2rem;
+  transition:background .25s, transform .25s, box-shadow .25s;
+  position:relative; overflow:hidden; cursor:default;
+}
+.service-card::before {
+  content:''; position:absolute; inset:0;
+  border:2px solid transparent;
+  transition:border-color .3s ease;
+  pointer-events:none; z-index:1;
+}
+.service-card:hover { background:var(--panel-lt); transform:translateY(-3px); box-shadow:0 12px 40px rgba(196,131,122,.12); }
+.service-card:hover::before { border-color:rgba(196,131,122,.35); }
+.service-card-cat {
+  font-family:'Jost',sans-serif; font-size:.58rem; font-weight:600;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:var(--rose); margin-bottom:.55rem; display:block;
+}
+.service-card-name {
+  font-family:'Cormorant Garamond',serif; font-size:1.25rem;
+  color:var(--cream); margin-bottom:.45rem; font-weight:400;
+}
+/* TESTO: modifica qui la descrizione del trattamento */
+.service-card-desc { font-size:.83rem; color:var(--muted); line-height:1.7; font-weight:300; }
+/* TESTO: modifica qui il prezzo (es. "da €35") */
+.service-card-price {
+  margin-top:1.2rem; font-family:'Cormorant Garamond',serif;
+  font-size:1.05rem; color:var(--gold);
+  display:flex; align-items:baseline; gap:.4rem;
+}
+.service-card-price .from {
+  font-family:'Jost',sans-serif; font-size:.6rem; font-weight:500;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
+}
+.service-special-tag {
+  position:absolute; top:.75rem; right:.75rem;
+  font-family:'Jost',sans-serif; font-size:.55rem; font-weight:700;
+  letter-spacing:.16em; text-transform:uppercase;
+  background:var(--rose); color:var(--cream); padding:.2rem .6rem; z-index:2;
+}
+.service-duration {
+  display:inline-flex; align-items:center; gap:.3rem; margin-top:.6rem;
+  font-size:.7rem; color:var(--muted); font-weight:400;
+}
+.service-duration::before { content:'○'; font-size:.55rem; color:var(--rose); }
+
+/* CTA book band */
+.book-band {
+  position:relative; z-index:1; padding:5rem 0;
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+.book-band h3 {
+  font-family:'Cormorant Garamond',serif; font-size:clamp(1.8rem,3vw,2.6rem);
+  font-weight:400; color:var(--cream); margin-bottom:.6rem;
+}
+.book-band h3 em { font-style:italic; color:var(--gold); }
+.book-band p { font-size:.95rem; color:var(--muted); margin-bottom:2rem; font-weight:300; }
+.book-band-btns { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+
+</style>
+</head>
+<body>
+
+<!-- ── NAVIGAZIONE ── -->
+<nav id="nav">
+  <div class="nav-links">
+    <a href="sinergie-servizi.html" class="active">Servizi</a>
+    <a href="index.html#about">Chi siamo</a>
+  </div>
+  <a href="index.html" class="nav-logo">Sinergie <em>·</em></a>
+  <div class="nav-links nav-links-right">
+    <a href="sinergie-recensioni.html">Recensioni</a>
+    <a href="sinergie-dove-siamo.html">Dove siamo</a>
+    <a href="sinergie-dove-siamo.html" class="nav-cta">Prenota ora →</a>
+  </div>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Apri menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="nav-mobile-menu" id="mobileMenu">
+    <a href="sinergie-servizi.html" class="active">Servizi</a>
+    <a href="index.html#about">Chi siamo</a>
+    <a href="sinergie-recensioni.html">Recensioni</a>
+    <a href="sinergie-dove-siamo.html">Dove siamo</a>
+    <a href="sinergie-dove-siamo.html" class="nav-mobile-cta">Prenota ora →</a>
+  </div>
+</nav>
+
+
+<!-- ── HERO ── -->
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <!-- TESTO: modifica qui l'eyebrow della pagina servizi -->
+    <span class="eyebrow">I trattamenti</span>
+    <!-- TESTO: modifica qui il titolo principale pagina servizi -->
+    <h1 class="page-title">Ogni cura,<em>su misura.</em></h1>
+    <!-- TESTO: modifica qui il sottotitolo pagina servizi -->
+    <p class="page-sub">Trattamenti viso, corpo, massaggi e molto altro. Ogni seduta è costruita intorno a te, con la stessa attenzione che metti in ogni cosa importante.</p>
+  </div>
+  <div class="hero-petal"></div>
+</div>
+
+
+<!-- ── SERVIZI PAGE ── -->
+<section class="servizi-page">
+  <!-- Bar mobile -->
+  <div class="servizi-cat-bar" id="serviziCatBar">
+    <button class="servizi-cat-btn active" data-cat="viso">Viso</button>
+    <button class="servizi-cat-btn" data-cat="corpo">Corpo</button>
+    <button class="servizi-cat-btn" data-cat="massaggi">Massaggi</button>
+    <button class="servizi-cat-btn" data-cat="ciglia">Ciglia</button>
+    <button class="servizi-cat-btn" data-cat="cerette">Cerette</button>
+    <button class="servizi-cat-btn" data-cat="pacchetti">Pacchetti</button>
+  </div>
+
+  <div class="servizi-layout">
+    <!-- Sidebar desktop -->
+    <div class="servizi-sidebar">
+      <span class="servizi-sidebar-title">Categorie</span>
+      <a href="#" class="servizi-cat-link active" data-cat="viso">✦ Viso</a>
+      <a href="#" class="servizi-cat-link" data-cat="corpo">✦ Corpo</a>
+      <a href="#" class="servizi-cat-link" data-cat="massaggi">✦ Massaggi</a>
+      <a href="#" class="servizi-cat-link" data-cat="ciglia">✦ Ciglia</a>
+      <a href="#" class="servizi-cat-link" data-cat="cerette">✦ Cerette</a>
+      <a href="#" class="servizi-cat-link" data-cat="pacchetti">✦ Pacchetti</a>
+    </div>
+
+    <!-- Area card -->
+    <div class="servizi-cards-area">
+      <div class="cat-section-header" id="catHeader">
+        <!-- TESTO: modifica qui il titolo categoria — aggiornato via JS -->
+        <h2>Trattamenti <em>Viso</em></h2>
+        <p>Protocolli personalizzati per ogni tipo di pelle, ogni esigenza, ogni età.</p>
+      </div>
+
+      <div class="servizi-cards-grid" id="serviziGrid">
+
+        <!-- ══ VISO ══ -->
+        <!-- TESTO: modifica qui nome, descrizione, prezzo e durata dei trattamenti viso -->
+        <div class="service-card" data-cat="viso">
+          <span class="service-special-tag">Signature</span>
+          <span class="service-card-cat">Viso · Pulizia</span>
+          <div class="service-card-name">Pulizia Profonda</div>
+          <div class="service-card-desc">Trattamento rigenerante con vapore, estrazione manuale professionale e maschera lenitiva. La base di ogni routine perfetta.</div>
+          <!-- TESTO: modifica qui il prezzo (es. "da €35") -->
+          <div class="service-card-price"><span class="from">da</span>€ 55</div>
+          <span class="service-duration">60 min</span>
+        </div>
+        <div class="service-card" data-cat="viso">
+          <span class="service-card-cat">Viso · Idratazione</span>
+          <div class="service-card-name">Trattamento Idratante Intensivo</div>
+          <div class="service-card-desc">Siero ad alta concentrazione di acido ialuronico e massaggio viso rilassante. Pelle luminosa e rimpolpata fin dalla prima seduta.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 50</div>
+          <span class="service-duration">50 min</span>
+        </div>
+        <div class="service-card" data-cat="viso">
+          <span class="service-card-cat">Viso · Anti-età</span>
+          <div class="service-card-name">Trattamento Anti-Età</div>
+          <div class="service-card-desc">Lifting manuale, principi attivi anti-rughe e maschera rassodante. Risultati visibili dopo la prima seduta.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 65</div>
+          <span class="service-duration">70 min</span>
+        </div>
+        <div class="service-card" data-cat="viso">
+          <span class="service-card-cat">Viso · Luminosità</span>
+          <div class="service-card-name">Peeling Enzimatico</div>
+          <div class="service-card-desc">Esfoliazione delicata con enzimi naturali. Rimuove le cellule morte e rivela la luminosità naturale della pelle.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 48</div>
+          <span class="service-duration">45 min</span>
+        </div>
+        <div class="service-card" data-cat="viso">
+          <span class="service-card-cat">Viso · Relax</span>
+          <div class="service-card-name">Trattamento Relax Viso</div>
+          <div class="service-card-desc">Massaggio cranio-facciale, aromaterapia e maschera al collagene. Per ritrovare il respiro e la luce.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 60</div>
+          <span class="service-duration">60 min</span>
+        </div>
+        <div class="service-card" data-cat="viso">
+          <span class="service-card-cat">Viso · Sensibile</span>
+          <div class="service-card-name">Trattamento Pelle Sensibile</div>
+          <div class="service-card-desc">Protocollo delicato specifico per pelli reattive e rossori. Calmante, nutriente, rispettoso.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 55</div>
+          <span class="service-duration">55 min</span>
+        </div>
+        <div class="service-card" data-cat="viso">
+          <span class="service-card-cat">Viso · Consulenza</span>
+          <div class="service-card-name">Consulenza + Trattamento</div>
+          <div class="service-card-desc">Analisi della pelle con Barbara e protocollo personalizzato. Il punto di partenza ideale per ogni nuova cliente.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 70</div>
+          <span class="service-duration">75 min</span>
+        </div>
+        <div class="service-card" data-cat="viso">
+          <span class="service-card-cat">Viso · Maschera</span>
+          <div class="service-card-name">Maschera al Collagene</div>
+          <div class="service-card-desc">Maschera nutriente ad alto contenuto di collagene marino. Rassoda, rimpolpa e leviga in una sola seduta.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 40</div>
+          <span class="service-duration">40 min</span>
+        </div>
+        <div class="service-card" data-cat="viso">
+          <span class="service-card-cat">Viso · Completo</span>
+          <div class="service-card-name">Trattamento Viso + Collo</div>
+          <div class="service-card-desc">Esteso a collo e décolleté per una cura completa. Perché la bellezza non si ferma al mento.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 75</div>
+          <span class="service-duration">80 min</span>
+        </div>
+
+        <!-- ══ CORPO ══ -->
+        <div class="service-card" data-cat="corpo">
+          <span class="service-special-tag">Signature</span>
+          <span class="service-card-cat">Corpo · Modellante</span>
+          <div class="service-card-name">Fango Bioattivo</div>
+          <div class="service-card-desc">Trattamento drenante e modellante con fanghi mineralizzanti. Perfetto per riattivare la circolazione e sgonfiare.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 65</div>
+          <span class="service-duration">60 min</span>
+        </div>
+        <div class="service-card" data-cat="corpo">
+          <span class="service-card-cat">Corpo · Rassodante</span>
+          <div class="service-card-name">Bendaggio Snellente</div>
+          <div class="service-card-desc">Bendaggi con principi attivi lipolitici e rassodanti. Silhouette più tonica e definita già dalla prima seduta.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 60</div>
+          <span class="service-duration">75 min</span>
+        </div>
+        <div class="service-card" data-cat="corpo">
+          <span class="service-card-cat">Corpo · Esfoliante</span>
+          <div class="service-card-name">Scrub Corpo Aromatico</div>
+          <div class="service-card-desc">Esfoliazione corpo con sali marini e oli essenziali selezionati. Pelle morbida come seta, mente in pace.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 45</div>
+          <span class="service-duration">45 min</span>
+        </div>
+        <div class="service-card" data-cat="corpo">
+          <span class="service-card-cat">Corpo · Drenante</span>
+          <div class="service-card-name">Trattamento Anticellulite</div>
+          <div class="service-card-desc">Massaggio specifico con principi attivi drenanti mirati. Programma personalizzato per gambe e cosce.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 55</div>
+          <span class="service-duration">60 min</span>
+        </div>
+        <div class="service-card" data-cat="corpo">
+          <span class="service-card-cat">Corpo · Nutrimento</span>
+          <div class="service-card-name">Maschera Corpo Nutriente</div>
+          <div class="service-card-desc">Maschera a base di burro di karité e oli preziosi. La pelle ritrova morbidezza, elasticità e profumo.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 50</div>
+          <span class="service-duration">50 min</span>
+        </div>
+        <div class="service-card" data-cat="corpo">
+          <span class="service-card-cat">Corpo · Completo</span>
+          <div class="service-card-name">Rituale Corpo Completo</div>
+          <div class="service-card-desc">Scrub, maschera nutriente e massaggio rilassante. Un'ora e mezza di puro benessere per corpo e mente.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 90</div>
+          <span class="service-duration">90 min</span>
+        </div>
+
+        <!-- ══ MASSAGGI ══ -->
+        <div class="service-card" data-cat="massaggi">
+          <span class="service-special-tag">Signature</span>
+          <span class="service-card-cat">Massaggio · Relax</span>
+          <div class="service-card-name">Massaggio Relax Corpo</div>
+          <div class="service-card-desc">Mani che sciolgono la tensione, oli caldi, pressioni calibrate. Il massaggio che ogni donna merita almeno una volta al mese.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 55</div>
+          <span class="service-duration">60 min</span>
+        </div>
+        <div class="service-card" data-cat="massaggi">
+          <span class="service-card-cat">Massaggio · Decontratturante</span>
+          <div class="service-card-name">Massaggio Decontratturante</div>
+          <div class="service-card-desc">Tecnica specifica su collo, spalle e schiena. Allevia tensioni muscolari profonde e migliora la postura.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 50</div>
+          <span class="service-duration">50 min</span>
+        </div>
+        <div class="service-card" data-cat="massaggi">
+          <span class="service-card-cat">Massaggio · Drenante</span>
+          <div class="service-card-name">Drenaggio Linfatico Manuale</div>
+          <div class="service-card-desc">Tecnica dolce per attivare il sistema linfatico, ridurre gonfiori e migliorare la circolazione periferica.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 60</div>
+          <span class="service-duration">60 min</span>
+        </div>
+        <div class="service-card" data-cat="massaggi">
+          <span class="service-card-cat">Massaggio · Aromaterapia</span>
+          <div class="service-card-name">Massaggio agli Oli Essenziali</div>
+          <div class="service-card-desc">Blend personalizzato di oli puri per equilibrare corpo e mente. Un viaggio sensoriale su misura.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 58</div>
+          <span class="service-duration">60 min</span>
+        </div>
+        <div class="service-card" data-cat="massaggi">
+          <span class="service-card-cat">Massaggio · Riflessologia</span>
+          <div class="service-card-name">Riflessologia Plantare</div>
+          <div class="service-card-desc">Massaggio riflesso dei piedi che agisce su tutto l'organismo. Profondo rilassamento e riequilibrio energetico.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 45</div>
+          <span class="service-duration">45 min</span>
+        </div>
+        <div class="service-card" data-cat="massaggi">
+          <span class="service-card-cat">Massaggio · Completo</span>
+          <div class="service-card-name">Massaggio Corpo + Viso</div>
+          <div class="service-card-desc">Massaggio corpo rilassante e massaggio viso decontratturante. Il protocollo completo del benessere.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 85</div>
+          <span class="service-duration">90 min</span>
+        </div>
+
+        <!-- ══ CIGLIA ══ -->
+        <div class="service-card" data-cat="ciglia">
+          <span class="service-special-tag">Signature</span>
+          <span class="service-card-cat">Ciglia · Laminazione</span>
+          <div class="service-card-name">Laminazione Ciglia</div>
+          <div class="service-card-desc">Trattamento che piega e nutre le ciglia naturali rendendole più folte e ricurve. Effetto dura 6–8 settimane.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 50</div>
+          <span class="service-duration">60 min</span>
+        </div>
+        <div class="service-card" data-cat="ciglia">
+          <span class="service-card-cat">Ciglia · Colore</span>
+          <div class="service-card-name">Tinta Ciglia</div>
+          <div class="service-card-desc">Colorazione professionale per uno sguardo definito e intenso. Ideale abbinata a qualsiasi trattamento.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 12</div>
+          <span class="service-duration">20 min</span>
+        </div>
+        <div class="service-card" data-cat="ciglia">
+          <span class="service-card-cat">Sopracciglia · Design</span>
+          <div class="service-card-name">Tinta Sopracciglia</div>
+          <div class="service-card-desc">Colore intenso e definito per sopracciglia perfettamente disegnate. Dura fino a 4 settimane.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 10</div>
+          <span class="service-duration">15 min</span>
+        </div>
+        <div class="service-card" data-cat="ciglia">
+          <span class="service-card-cat">Sopracciglia · Definizione</span>
+          <div class="service-card-name">Definizione Sopracciglia</div>
+          <div class="service-card-desc">Pulizia, design e colore per sopracciglia architettate a regola d'arte. Lo sguardo cambia tutto.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 18</div>
+          <span class="service-duration">25 min</span>
+        </div>
+        <div class="service-card" data-cat="ciglia">
+          <span class="service-card-cat">Ciglia + Sopracciglia</span>
+          <div class="service-card-name">Laminazione + Tinta Completa</div>
+          <div class="service-card-desc">Laminazione ciglia, tinta ciglia e tinta sopracciglia. Il trattamento occhi completo — uno sguardo che parla.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 65</div>
+          <span class="service-duration">75 min</span>
+        </div>
+        <div class="service-card" data-cat="ciglia">
+          <span class="service-card-cat">Ciglia · Nutrimento</span>
+          <div class="service-card-name">Trattamento Nutriente Ciglia</div>
+          <div class="service-card-desc">Siero rigenerante per ciglia fragili. Rafforza il bulbo e favorisce una crescita più sana e folta.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 30</div>
+          <span class="service-duration">30 min</span>
+        </div>
+
+        <!-- ══ CERETTE ══ -->
+        <div class="service-card" data-cat="cerette">
+          <span class="service-card-cat">Ceretta · Gambe</span>
+          <div class="service-card-name">Ceretta Gambe Intere</div>
+          <div class="service-card-desc">Cera tiepida professionale per una depilazione completa e duratura. Pelle setosa a lungo.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 30</div>
+          <span class="service-duration">40 min</span>
+        </div>
+        <div class="service-card" data-cat="cerette">
+          <span class="service-card-cat">Ceretta · Semiporto</span>
+          <div class="service-card-name">Ceretta Gambe a Metà</div>
+          <div class="service-card-desc">Depilazione dalla coscia o dal ginocchio in giù, con cera professionale a bassa temperatura.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 18</div>
+          <span class="service-duration">25 min</span>
+        </div>
+        <div class="service-card" data-cat="cerette">
+          <span class="service-card-cat">Ceretta · Ascelle</span>
+          <div class="service-card-name">Ceretta Ascelle</div>
+          <div class="service-card-desc">Rapida, precisa, efficace. Risultato netto con la minima irritazione.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 10</div>
+          <span class="service-duration">10 min</span>
+        </div>
+        <div class="service-card" data-cat="cerette">
+          <span class="service-card-cat">Ceretta · Viso</span>
+          <div class="service-card-name">Ceretta Viso</div>
+          <div class="service-card-desc">Baffi, mento o guance — depilazione precisa e delicata per il viso con cera apposita.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 8</div>
+          <span class="service-duration">10 min</span>
+        </div>
+        <div class="service-card" data-cat="cerette">
+          <span class="service-card-cat">Ceretta · Braccia</span>
+          <div class="service-card-name">Ceretta Braccia</div>
+          <div class="service-card-desc">Depilazione delle braccia intere o parziale, con cera delicata e lenitivo post-trattamento.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 18</div>
+          <span class="service-duration">20 min</span>
+        </div>
+        <div class="service-card" data-cat="cerette">
+          <span class="service-card-cat">Ceretta · Completa</span>
+          <div class="service-card-name">Ceretta Corpo Completa</div>
+          <div class="service-card-desc">Depilazione completa gambe, ascelle e zona bikini. Tutto in un'unica seduta pratica ed efficiente.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 50</div>
+          <span class="service-duration">60 min</span>
+        </div>
+
+        <!-- ══ PACCHETTI ══ -->
+        <div class="service-card" data-cat="pacchetti">
+          <span class="service-special-tag">Signature</span>
+          <span class="service-card-cat">Pacchetto · Benessere</span>
+          <div class="service-card-name">Percorso Rinascita</div>
+          <div class="service-card-desc">4 trattamenti viso + 2 massaggi relax. Un percorso di 6 sedute per ritrovare la tua luminosità naturale.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 290</div>
+          <span class="service-duration">6 sedute</span>
+        </div>
+        <div class="service-card" data-cat="pacchetti">
+          <span class="service-card-cat">Pacchetto · Sposa</span>
+          <div class="service-card-name">Preparazione Sposa</div>
+          <div class="service-card-desc">Percorso personalizzato pre-matrimonio: viso, corpo, ciglia. Perché il tuo giorno più bello meriti il meglio.</div>
+          <div class="service-card-price">Su richiesta</div>
+          <span class="service-duration">Percorso su misura</span>
+        </div>
+        <div class="service-card" data-cat="pacchetti">
+          <span class="service-card-cat">Pacchetto · Regalo</span>
+          <div class="service-card-name">Gift Card Sinergie</div>
+          <div class="service-card-desc">Un'ora solo per sé — il regalo più bello che si possa fare. Personalizzabile per ogni importo, consegnata con cura.</div>
+          <div class="service-card-price">A scelta</div>
+          <span class="service-duration">Per lei, per chiunque ami</span>
+        </div>
+        <div class="service-card" data-cat="pacchetti">
+          <span class="service-card-cat">Pacchetto · Corpo</span>
+          <div class="service-card-name">Percorso Corpo Slim</div>
+          <div class="service-card-desc">6 sedute corpo con alternanza di trattamenti drenanti, modellanti e massaggi specifici. Risultati progressivi e duraturi.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 320</div>
+          <span class="service-duration">6 sedute</span>
+        </div>
+        <div class="service-card" data-cat="pacchetti">
+          <span class="service-card-cat">Pacchetto · Viso</span>
+          <div class="service-card-name">Ciclo Viso Luminoso</div>
+          <div class="service-card-desc">3 trattamenti viso ravvicinati per massimizzare i risultati prima di un evento. Effetto visibile e immediato.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 160</div>
+          <span class="service-duration">3 sedute</span>
+        </div>
+        <div class="service-card" data-cat="pacchetti">
+          <span class="service-card-cat">Pacchetto · Completo</span>
+          <div class="service-card-name">Giornata Sinergie</div>
+          <div class="service-card-desc">Mezza giornata intera solo per te: trattamento viso, massaggio corpo, laminazione ciglia e relax assoluto.</div>
+          <div class="service-card-price"><span class="from">da</span>€ 180</div>
+          <span class="service-duration">3–4 ore</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ── CTA PRENOTAZIONE ── -->
+<div class="book-band">
+  <!-- TESTO: modifica qui il testo della sezione di prenotazione -->
+  <h3>Pronta a prenderti <em>cura di te?</em></h3>
+  <p>Chiama o scrivi a Barbara per fissare il tuo appuntamento.</p>
+  <div class="book-band-btns">
+    <a href="tel:+390464712994" class="btn-primary">☎ 0464 712994</a>
+    <a href="sinergie-dove-siamo.html" class="btn-outline">Scrivici →</a>
+  </div>
+</div>
+
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Sinergie <em>·</em></div>
+      <div class="footer-tagline">Estetica Di Tosin Barbara<br>Via Pasubio 45/B · Rovereto (TN)</div>
+    </div>
+    <div>
+      <span class="footer-col-title">Pagine</span>
+      <ul class="footer-links">
+        <li><a href="index.html">Homepage</a></li>
+        <li><a href="sinergie-servizi.html">I trattamenti</a></li>
+        <li><a href="sinergie-recensioni.html">Recensioni</a></li>
+        <li><a href="sinergie-dove-siamo.html">Dove siamo</a></li>
+      </ul>
+    </div>
+    <div>
+      <span class="footer-col-title">Contatti</span>
+      <div class="footer-address">
+        Via Pasubio 45/B<br>38068 Rovereto (TN)<br><br>
+        Tel: <a href="tel:+390464712994" style="color:var(--muted);text-decoration:none;">0464 712994</a><br>
+        Cel: <a href="tel:+393465723942" style="color:var(--muted);text-decoration:none;">346 572 3942</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 Estetica Sinergie Di Tosin Barbara · Rovereto (TN)</div>
+    <div class="footer-copy">10 anni · 98% clienti soddisfatte</div>
+    <a href="sinergie-storia.html" class="footer-secret" title="">✦</a>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 60));
+
+  document.getElementById('navHamburger').addEventListener('click', function() {
+    const open = nav.classList.toggle('nav-open');
+    this.setAttribute('aria-expanded', open);
+  });
+  document.addEventListener('click', e => { if (!nav.contains(e.target)) nav.classList.remove('nav-open'); });
+
+  const grid = document.getElementById('serviziGrid');
+  const catHeader = document.getElementById('catHeader');
+
+  const catMeta = {
+    viso:      { title:'Trattamenti <em>Viso</em>', desc:'Protocolli personalizzati per ogni tipo di pelle, ogni esigenza, ogni età.' },
+    corpo:     { title:'Trattamenti <em>Corpo</em>', desc:'Modellamento, nutrimento e detox. Il tuo corpo merita la stessa cura del tuo viso.' },
+    massaggi:  { title:'Massaggi <em>Benessere</em>', desc:'Le mani di Barbara sciolgono tensioni, riattivano la circolazione, restituiscono leggerezza.' },
+    ciglia:    { title:'Ciglia & <em>Sopracciglia</em>', desc:'Uno sguardo definito e naturale, senza trucco. La laminazione che dura.' },
+    cerette:   { title:'Cerette <em>Professionali</em>', desc:'Depilazione dolce e duratura. Cera professionale a bassa temperatura per ogni zona.' },
+    pacchetti: { title:'Pacchetti & <em>Percorsi</em>', desc:'Più sedute, più risultati. O semplicemente il regalo più bello.' }
+  };
+
+  function filterServizi(cat) {
+    grid.classList.add('fading');
+    setTimeout(() => {
+      document.querySelectorAll('#serviziGrid .service-card')
+        .forEach(i => { i.style.display = i.dataset.cat === cat ? '' : 'none'; });
+      catHeader.querySelector('h2').innerHTML = catMeta[cat].title;
+      catHeader.querySelector('p').textContent = catMeta[cat].desc;
+      grid.classList.remove('fading');
+    }, 280);
+  }
+  filterServizi('viso');
+
+  document.querySelectorAll('.servizi-cat-link, .servizi-cat-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault();
+      const cat = btn.dataset.cat;
+      document.querySelectorAll('.servizi-cat-link, .servizi-cat-btn')
+        .forEach(b => b.classList.toggle('active', b.dataset.cat === cat));
+      filterServizi(cat);
+    });
+  });
+</script>
+</body>
+</html>
