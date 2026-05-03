@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Sinergie Estetica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;1,400&family=Jost:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sinergie-admin.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     AUTH SCREEN
+═══════════════════════════════════════════════ -->
+<div id="authScreen">
+  <div class="auth-box">
+    <div class="auth-logo">Sinergie <em>·</em></div>
+    <div class="auth-subtitle">Pannello admin — Estetica Sinergie</div>
+
+    <!-- Step 1: email + password -->
+    <div id="loginStep">
+      <div class="auth-field">
+        <label for="authEmail">Email</label>
+        <input type="email" id="authEmail" placeholder="admin@sinergie.it" autocomplete="email">
+      </div>
+      <div class="auth-field">
+        <label for="authPassword">Password</label>
+        <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="auth-error" id="authError"></div>
+      <button class="auth-btn" id="authLoginBtn">Accedi</button>
+    </div>
+
+    <!-- Step 2: OTP (se MFA abilitato su Supabase) -->
+    <div id="otpStep" class="auth-field">
+      <p class="auth-info">Controlla la tua email — ti abbiamo inviato un codice a 6 cifre.</p>
+      <div class="auth-field">
+        <label for="authOtp">Codice OTP</label>
+        <input type="text" id="authOtp" placeholder="123456" maxlength="6" inputmode="numeric">
+      </div>
+      <div class="auth-error" id="otpError"></div>
+      <button class="auth-btn" id="authOtpBtn">Verifica codice</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     APP SCREEN
+═══════════════════════════════════════════════ -->
+<div id="appScreen">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <span class="topbar-logo">Sinergie <em>·</em></span>
+    <span class="topbar-badge">Admin</span>
+    <div class="topbar-spacer"></div>
+    <div class="topbar-search">
+      <input type="search" id="searchInput" placeholder="Cerca nome…" autocomplete="off">
+      <span class="s-icon">⌕</span>
+    </div>
+    <button class="btn-logout" id="btnLogout">Esci</button>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="statsbar">
+    <div class="stat-chip new-chip">Nuove: <b id="statNuove">—</b></div>
+    <div class="stat-chip">Totali: <b id="statTotali">—</b></div>
+    <div class="stat-chip">Oggi: <b id="statOggi">—</b></div>
+    <div class="stat-chip">Risposte inviate: <b id="statRisposte">—</b></div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <button class="filter-btn active" data-filter="all">
+      Tutte <span class="tab-badge" id="badgeAll">0</span>
+    </button>
+    <button class="filter-btn" data-filter="nuova">
+      🟡 Nuove <span class="tab-badge" id="badgeNuove">0</span>
+    </button>
+    <button class="filter-btn" data-filter="letta">
+      Lette <span class="tab-badge" id="badgeLette">0</span>
+    </button>
+    <button class="filter-btn" data-filter="risposta">
+      ✓ Risposte <span class="tab-badge" id="badgeRisposte">0</span>
+    </button>
+  </div>
+
+  <!-- LISTA DOMANDE -->
+  <div class="domande-list" id="domandeList">
+    <div class="loading-state">
+      <span class="mini-spinner"></span>Caricamento domande…
+    </div>
+  </div>
+
+  <!-- SETUP SQL — istruzioni per lo sviluppatore -->
+  <details class="sql-block">
+    <summary>Setup Supabase — SQL e istruzioni (solo sviluppatore)</summary>
+    <div class="sql-content">
+      <p class="note">
+        Esegui questo SQL nel pannello Supabase → SQL Editor per creare la tabella e
+        configurare Row Level Security. Poi inserisci le tue credenziali nelle costanti
+        in cima allo script di questa pagina e in <code>sinergie-dove-siamo.html</code>.
+      </p>
+      <pre>-- ══════════════════════════════════════════
+-- Tabella domande (richieste clienti)
+-- ══════════════════════════════════════════
+create table domande (
+  id          uuid default gen_random_uuid() primary key,
+  created_at  timestamptz default now(),
+  nome        text not null,
+  telefono    text,
+  email       text,
+  servizio    text,
+  messaggio   text not null,
+  stato       text default 'nuova'
+              check (stato in ('nuova','letta','risposta')),
+  risposta    text,
+  risposta_at timestamptz
+);
+
+-- Abilita RLS
+alter table domande enable row level security;
+
+-- Il form pubblico può solo inserire (anon key)
+create policy "insert_public" on domande
+  for insert to anon with check (true);
+
+-- Solo utenti autenticati possono leggere e modificare
+create policy "all_authenticated" on domande
+  for all to authenticated using (true);
+
+-- Indice per data (ordinamento)
+create index idx_domande_created on domande(created_at desc);
+
+-- ══════════════════════════════════════════
+-- Abilita Realtime (per notifiche live in admin)
+-- ══════════════════════════════════════════
+-- In Supabase → Database → Replication:
+-- abilita la tabella "domande" per realtime.
+-- ══════════════════════════════════════════
+
+-- CREDENZIALI DA INSERIRE:
+-- 1. In questa pagina (admin): SUPABASE_URL e SUPABASE_SERVICE_KEY
+--    La service_role key si trova in:
+--    Supabase → Project Settings → API → service_role (secret)
+--
+-- 2. In sinergie-dove-siamo.html (form pubblico): SUPABASE_URL e SUPABASE_ANON_KEY
+--    La anon key si trova in:
+--    Supabase → Project Settings → API → anon (public)
+--
+-- 3. Per i Twilio SMS (risposte): TWILIO_SID, TWILIO_TOKEN, TWILIO_FROM
+--    Crea un account su twilio.com, acquista un numero italiano
+--    e inserisci qui le credenziali.
+--    NOTA: le credenziali Twilio sono visibili nel sorgente JS.
+--    Per un uso professionale considera una Supabase Edge Function.
+</pre>
+    </div>
+  </details>
+
+</div><!-- /appScreen -->
+
+<!-- TOAST -->
+<div class="toast" id="appToast" role="status" aria-live="polite"></div>
+
+
+<script type="module">
+// ════════════════════════════════════════════════════════════════
+//  CONFIGURAZIONE ← inserisci qui i tuoi dati reali
+// ════════════════════════════════════════════════════════════════
+
+// Supabase — usa la service_role key (non la anon key) nell'admin
+// la trovi in: Supabase → Project Settings → API → service_role
+const SUPABASE_URL         = 'https://YOUR_PROJECT.supabase.co';      // ← sostituisci
+const SUPABASE_SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.YOUR_SERVICE_KEY'; // ← sostituisci
+
+// Twilio — per l'invio SMS alle clienti
+// Crea un account su twilio.com/try-twilio, acquista un numero e incolla qui.
+// NOTA: in un'app di produzione seria queste credenziali andrebbero in una
+// Supabase Edge Function per non esporle nel sorgente del browser.
+const TWILIO_SID   = 'YOUR_TWILIO_ACCOUNT_SID';   // ← Account SID da twilio.com/console
+const TWILIO_TOKEN = 'YOUR_TWILIO_AUTH_TOKEN';     // ← Auth Token da twilio.com/console
+const TWILIO_FROM  = '+39000000000';               // ← Numero Twilio acquistato (+39...)
+
+// Dati di Sinergie (usati nel testo degli SMS e delle email)
+const SINERGIE_NOME  = 'Estetica Sinergie — Barbara';
+const SINERGIE_TEL   = '+39 0464 712994';
+const SINERGIE_EMAIL = 'esteticasinergierovereto@gmail.com';
+
+// ════════════════════════════════════════════════════════════════
+//  SUPABASE INIT
+// ════════════════════════════════════════════════════════════════
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+// ── Utility ──────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+
+// ════════════════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════════════════
+let mfaFactorId = null;
+
+async function checkSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) showApp();
+}
+
+$('authLoginBtn').addEventListener('click', doLogin);
+$('authEmail').addEventListener('keydown',    e => { if (e.key === 'Enter') doLogin(); });
+$('authPassword').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const btn  = $('authLoginBtn');
+  const errEl = $('authError');
+  const email = $('authEmail').value.trim();
+  const pw    = $('authPassword').value;
+  if (!email || !pw) { showAuthErr(errEl, 'Inserisci email e password.'); return; }
+
+  btn.disabled = true; btn.textContent = 'Accesso…';
+  errEl.classList.remove('show');
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+  btn.disabled = false; btn.textContent = 'Accedi';
+
+  if (error) {
+    if (error.message?.includes('mfa') || error.code === 'mfa_required') {
+      await handleMFA();
+    } else {
+      showAuthErr(errEl, 'Credenziali non valide. Riprova.');
+    }
+    return;
+  }
+  showApp();
+}
+
+async function handleMFA() {
+  const { data: factors } = await supabase.auth.mfa.listFactors();
+  const totp = factors?.totp?.[0];
+  if (!totp) { showAuthErr($('authError'), 'MFA richiesto ma nessun fattore trovato.'); return; }
+  mfaFactorId = totp.id;
+  await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
+  $('otpStep').classList.add('show');
+  $('authOtp').focus();
+}
+
+$('authOtpBtn').addEventListener('click', doVerifyOtp);
+$('authOtp').addEventListener('keydown', e => { if (e.key === 'Enter') doVerifyOtp(); });
+
+async function doVerifyOtp() {
+  const btn  = $('authOtpBtn');
+  const errEl = $('otpError');
+  const code  = $('authOtp').value.trim();
+  if (!code) { showAuthErr(errEl, 'Inserisci il codice.'); return; }
+  btn.disabled = true; btn.textContent = 'Verifica…';
+  const { error } = await supabase.auth.mfa.verify({ factorId: mfaFactorId, challengeId: mfaFactorId, code });
+  btn.disabled = false; btn.textContent = 'Verifica codice';
+  if (error) { showAuthErr(errEl, 'Codice non valido. Riprova.'); return; }
+  showApp();
+}
+
+function showAuthErr(el, msg) { el.textContent = msg; el.classList.add('show'); }
+
+$('btnLogout').addEventListener('click', async () => {
+  await supabase.auth.signOut();
+  location.reload();
+});
+
+// ════════════════════════════════════════════════════════════════
+//  APP STATE
+// ════════════════════════════════════════════════════════════════
+let allDomande  = [];
+let activeFilter = 'all';
+let searchQuery  = '';
+
+function showApp() {
+  $('authScreen').classList.add('hidden');
+  $('appScreen').classList.add('show');
+  loadDomande();
+  subscribeRealtime();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  LOAD DATA
+// ════════════════════════════════════════════════════════════════
+async function loadDomande() {
+  $('domandeList').innerHTML =
+    '<div class="loading-state"><span class="mini-spinner"></span>Caricamento domande…</div>';
+
+  const { data, error } = await supabase
+    .from('domande')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    $('domandeList').innerHTML =
+      `<div class="loading-state" style="color:var(--red-lt)">Errore: ${error.message}</div>`;
+    return;
+  }
+
+  allDomande = data || [];
+  updateStats();
+  render();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  REALTIME — nuove domande senza refresh
+// ════════════════════════════════════════════════════════════════
+function subscribeRealtime() {
+  supabase
+    .channel('domande-channel')
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'domande' },
+      payload => {
+        allDomande.unshift(payload.new);
+        updateStats();
+        render();
+        showToast(`📩 Nuova domanda da ${payload.new.nome}!`, 'orange');
+      })
+    .subscribe();
+}
+
+// ════════════════════════════════════════════════════════════════
+//  FILTER TABS
+// ════════════════════════════════════════════════════════════════
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    activeFilter = btn.dataset.filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  });
+});
+
+$('searchInput').addEventListener('input', function() {
+  searchQuery = this.value.toLowerCase().trim();
+  render();
+});
+
+// ════════════════════════════════════════════════════════════════
+//  STATS
+// ════════════════════════════════════════════════════════════════
+function updateStats() {
+  const todayYMD = new Date().toISOString().slice(0, 10);
+  const nuove    = allDomande.filter(d => d.stato === 'nuova');
+  const risposte = allDomande.filter(d => d.stato === 'risposta');
+  const oggi     = allDomande.filter(d => d.created_at?.slice(0, 10) === todayYMD);
+
+  $('statNuove').textContent    = nuove.length;
+  $('statTotali').textContent   = allDomande.length;
+  $('statOggi').textContent     = oggi.length;
+  $('statRisposte').textContent = risposte.length;
+
+  // Badge filter tabs
+  $('badgeAll').textContent      = allDomande.length;
+  $('badgeNuove').textContent    = nuove.length;
+  $('badgeLette').textContent    = allDomande.filter(d => d.stato === 'letta').length;
+  $('badgeRisposte').textContent = risposte.length;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RENDER
+// ════════════════════════════════════════════════════════════════
+function render() {
+  const list = $('domandeList');
+  const filtered = allDomande.filter(d => {
+    const matchFilter = activeFilter === 'all' || d.stato === activeFilter;
+    const matchSearch = !searchQuery ||
+      d.nome?.toLowerCase().includes(searchQuery) ||
+      d.telefono?.includes(searchQuery) ||
+      d.email?.toLowerCase().includes(searchQuery);
+    return matchFilter && matchSearch;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state">Nessuna domanda trovata.</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(d => renderCard(d)).join('');
+  attachCardListeners();
+}
+
+function renderCard(d) {
+  const dt = d.created_at
+    ? new Date(d.created_at).toLocaleString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' })
+    : '—';
+
+  const servizioHtml = d.servizio
+    ? `<span class="domanda-servizio">${esc(d.servizio)}</span>` : '';
+
+  const badgeLabel = { nuova:'🟡 Nuova', letta:'Letta', risposta:'✓ Risposta' }[d.stato] || d.stato;
+
+  const telHtml = d.telefono
+    ? `<a href="tel:${esc(d.telefono)}" class="domanda-contact-chip">
+         <span>📞</span>${esc(d.telefono)}</a>` : '';
+  const emailHtml = d.email
+    ? `<a href="mailto:${esc(d.email)}" class="domanda-contact-chip">
+         <span>✉</span>${esc(d.email)}</a>` : '';
+
+  // Risposta già inviata
+  const rispostaHtml = d.risposta
+    ? `<div class="domanda-risposta-data">
+         Risposta inviata il ${new Date(d.risposta_at).toLocaleString('it-IT', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}
+       </div>
+       <div class="domanda-risposta-text">${esc(d.risposta)}</div>` : '';
+
+  // Pulsante "Segna letta" — disabilitato se già letta o risposta
+  const lettaDisabled = d.stato !== 'nuova' ? 'disabled' : '';
+  const lettaLabel    = d.stato === 'nuova' ? 'Segna come letta' : 'Letta';
+
+  // SMS — disabilitato se no telefono
+  const smsDisabled = d.telefono ? '' : 'disabled title="Nessun numero di telefono"';
+
+  return `
+<div class="domanda-card ${d.stato}" data-id="${d.id}">
+  <div class="domanda-header">
+    <div class="domanda-nome">${esc(d.nome)}</div>
+    ${servizioHtml}
+    <span class="badge-domanda ${d.stato}">${badgeLabel}</span>
+    <div class="domanda-time">${dt}</div>
+    <div class="domanda-arrow">▶</div>
+  </div>
+  <div class="domanda-body">
+    <div class="domanda-contacts">
+      ${telHtml}
+      ${emailHtml}
+    </div>
+    <div class="domanda-messaggio">${esc(d.messaggio)}</div>
+
+    ${rispostaHtml}
+
+    <div class="reply-area">
+      <label class="reply-label">Scrivi risposta</label>
+      <textarea class="reply-textarea" data-id="${d.id}"
+        placeholder="Scrivi qui la risposta a ${esc(d.nome)}…">${d.risposta ? esc(d.risposta) : ''}</textarea>
+      <div class="reply-btns">
+        <button class="btn-sms" data-id="${d.id}" data-tel="${esc(d.telefono || '')}"
+          data-nome="${esc(d.nome)}" ${smsDisabled}>
+          📱 Invia via SMS
+        </button>
+        <button class="btn-email" data-id="${d.id}"
+          data-email="${esc(d.email || '')}" data-nome="${esc(d.nome)}">
+          ✉ Apri email
+        </button>
+        <button class="btn-letta" data-id="${d.id}" ${lettaDisabled}>
+          ${lettaLabel}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>`;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  CARD EVENT LISTENERS
+// ════════════════════════════════════════════════════════════════
+function attachCardListeners() {
+  // Toggle open/close + segna come letta
+  document.querySelectorAll('.domanda-header').forEach(header => {
+    header.addEventListener('click', async () => {
+      const card = header.closest('.domanda-card');
+      card.classList.toggle('open');
+
+      // Segna come "letta" automaticamente quando si apre per la prima volta
+      if (card.classList.contains('open')) {
+        const id = card.dataset.id;
+        const d  = allDomande.find(x => x.id === id);
+        if (d && d.stato === 'nuova') {
+          await aggiornaStato(id, 'letta');
+        }
+      }
+    });
+  });
+
+  // Pulsante "Segna come letta" manuale
+  document.querySelectorAll('.btn-letta').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      if (btn.disabled) return;
+      const id = btn.dataset.id;
+      btn.disabled = true; btn.textContent = '…';
+      await aggiornaStato(id, 'letta');
+    });
+  });
+
+  // Pulsante SMS
+  document.querySelectorAll('.btn-sms').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      if (btn.disabled) return;
+      const id    = btn.dataset.id;
+      const tel   = btn.dataset.tel;
+      const nome  = btn.dataset.nome;
+      const card  = btn.closest('.domanda-card');
+      const tarea = card.querySelector('.reply-textarea');
+      const testo = tarea.value.trim();
+
+      if (!testo) { showToast('Scrivi prima la risposta nel campo testo.', 'orange'); return; }
+      if (!tel)   { showToast('La cliente non ha fornito un numero di telefono.', 'orange'); return; }
+
+      btn.disabled = true; btn.textContent = 'Invio…';
+      const ok = await sendSMS(tel, nome, testo);
+      btn.disabled = false; btn.textContent = '📱 Invia via SMS';
+
+      if (ok) {
+        await salvaRisposta(id, testo);
+        showToast(`✓ SMS inviato a ${nome} (${tel})`, 'green');
+      }
+    });
+  });
+
+  // Pulsante Email — apre mailto: con risposta precompilata
+  document.querySelectorAll('.btn-email').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id    = btn.dataset.id;
+      const email = btn.dataset.email;
+      const nome  = btn.dataset.nome;
+      const card  = btn.closest('.domanda-card');
+      const tarea = card.querySelector('.reply-textarea');
+      const testo = tarea.value.trim();
+
+      if (!testo) { showToast('Scrivi prima la risposta nel campo testo.', 'orange'); return; }
+
+      if (!email) {
+        showToast('La cliente non ha fornito un indirizzo email.', 'orange');
+        return;
+      }
+
+      const subject = encodeURIComponent(`Risposta dalla tua richiesta — ${SINERGIE_NOME}`);
+      const body    = encodeURIComponent(
+        `Ciao ${nome},\n\n${testo}\n\nA presto,\nBarbara\n${SINERGIE_NOME}\n${SINERGIE_TEL}`
+      );
+      window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+
+      // Salva risposta su Supabase e segna come "risposta"
+      salvaRisposta(id, testo).then(() => {
+        showToast(`✉ Email aperta per ${nome}`, 'green');
+      });
+    });
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  SUPABASE ACTIONS
+// ════════════════════════════════════════════════════════════════
+async function aggiornaStato(id, nuovoStato) {
+  const { error } = await supabase
+    .from('domande')
+    .update({ stato: nuovoStato })
+    .eq('id', id);
+
+  if (error) { showToast('Errore aggiornamento stato.', 'red'); return; }
+
+  const d = allDomande.find(x => x.id === id);
+  if (d) d.stato = nuovoStato;
+  updateStats();
+
+  // Aggiorna solo la card visiva (no full re-render)
+  const card  = document.querySelector(`.domanda-card[data-id="${id}"]`);
+  if (!card) return;
+  card.className = `domanda-card ${nuovoStato} open`;
+  const badge = card.querySelector('.badge-domanda');
+  if (badge) {
+    badge.className  = `badge-domanda ${nuovoStato}`;
+    badge.textContent = { nuova:'🟡 Nuova', letta:'Letta', risposta:'✓ Risposta' }[nuovoStato];
+  }
+  const btnLetta = card.querySelector('.btn-letta');
+  if (btnLetta && nuovoStato !== 'nuova') {
+    btnLetta.disabled    = true;
+    btnLetta.textContent = 'Letta';
+  }
+}
+
+async function salvaRisposta(id, testo) {
+  const { error } = await supabase
+    .from('domande')
+    .update({ stato: 'risposta', risposta: testo, risposta_at: new Date().toISOString() })
+    .eq('id', id);
+
+  if (error) { showToast('Errore salvataggio risposta.', 'red'); return false; }
+
+  const d = allDomande.find(x => x.id === id);
+  if (d) { d.stato = 'risposta'; d.risposta = testo; d.risposta_at = new Date().toISOString(); }
+  updateStats();
+  await aggiornaStato(id, 'risposta');
+  return true;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  TWILIO SMS
+// ════════════════════════════════════════════════════════════════
+async function sendSMS(tel, nome, testo) {
+  const url    = `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`;
+  const body   = `${SINERGIE_NOME} risponde a ${nome}:\n\n${testo}\n\nPer info: ${SINERGIE_TEL}`;
+  const params = new URLSearchParams({ To: tel, From: TWILIO_FROM, Body: body });
+
+  try {
+    const res = await fetch(url, {
+      method:  'POST',
+      headers: {
+        'Authorization': 'Basic ' + btoa(`${TWILIO_SID}:${TWILIO_TOKEN}`),
+        'Content-Type':  'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `HTTP ${res.status}`);
+    }
+    return true;
+
+  } catch (err) {
+    showToast(`SMS non inviato — ${err.message}. Usa il pulsante Email o contatta il cliente manualmente.`, 'red');
+    return false;
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  UTILS
+// ════════════════════════════════════════════════════════════════
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, type = 'green') {
+  const t = $('appToast');
+  t.textContent = msg;
+  t.className   = `toast ${type}`;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 6000);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════════════
+checkSession();
+</script>
+</body>
+</html>
